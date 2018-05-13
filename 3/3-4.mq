@@ -1,4 +1,4 @@
-'声明,调用.  '找字
+'声明,调用.      '找字
 SetRowsNumber(0)
 '注意：每次制作完字库后，需要自行把制作的字库文件添加到脚本“附件”中
 TracePrint SetDictEx(0, "Attachment:mq_soft.txt")
