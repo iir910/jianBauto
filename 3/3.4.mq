@@ -1,7 +1,7 @@
-//设备
+'
 'mumu 1280*720 240dpi 
 '极速+ 渲染加速
-//======
+'===================
 '声明,调用.      
 '找字
 SetRowsNumber(0)
@@ -9,16 +9,91 @@ SetRowsNumber(0)
 TracePrint SetDictEx(0, "Attachment:mq_soft.txt")
 TracePrint UseDict(0)
 '以上两句脚本只需要调用一次
-'TracePrint "消息框的坐标 "&""&a&","&b
-Dim intX,intY
-Dim cjx,cjy
-Dim t
+Import "GK.lua" '果壳插件  
+Import "zm.luae" '紫猫插件
+zm.Init  //初始化插件,只需执行一次
+
+'=============定义变量================
+Dim intX,intY '坐标
+Dim t '时间,计秒
 Dim 找图
-Import "GK.lua" '果壳插件
+Dim ret '找图
 Dim 次数=0 '记录刷小怪的次数
-Delay 1000
+Delay 500
 '===================================================================
 '========判断目前所在状态======
+
+'序号坐标图片名 = zm.FindPic([对象,][x1,y1,x2,y2,][图片][,偏色][,方向][,相似度][,智能相似度][,超时时间][,是否点击][,点击坐标][,显示日志][,输出行号][,备注][,等待消失][,消失超时][,参数返回值])
+
+ret = zm.FindPic("主页.png|大地图.png|切换.png", 0.9)
+Dim x=ret(1)
+dim y=ret(2)
+If ret Then
+    TracePrint "可以用以下3种格式获取返回值"
+    TracePrint "找到序号" & ret(0), "x=" & ret(1), "y=" & ret(2), "图片名=" & ret(3)
+    TracePrint "找到序号" & ret[1], "x=" & ret[2], "y=" & ret[3], "图片名=" & ret[4]
+    TracePrint "找到序号" & ret["id"], "x=" & ret["x"], "y=" & ret["y"], "图片名=" & ret["name"]
+    Goto 传送门
+    
+Else
+    TracePrint "没有找到"
+    
+End If
+
+EndScript
+
+Rem 传送门
+If ret(0) = 0 Then 
+	 TracePrint "在首页." 
+	 Goto 首页
+	 Else 
+	 EndScript 	 
+End If
+IIf ret(0) = 1 Then 
+	 TracePrint "在大地图." 
+	 	 Goto 大地图
+	 Else 
+	 EndScript 	 
+End If
+If ret(0) = 2 Then 
+	 TracePrint "在 ." 
+	 Else 
+	 EndScript 	 
+End If
+If ret(0) = 3 Then 
+	 TracePrint "在 ." 
+	 Else 
+	 EndScript 	 
+End If
+If ret(0) = 4 Then 
+	 TracePrint "在 ." 
+	 Else 
+	 EndScript 	 
+End If
+f ret(0) = 5 Then 
+	 TracePrint "在 ." 
+	 Else 
+	 EndScript 	 
+End If
+
+
+
+
+
+
+EndScript
+
+Rem 首页
+EndScript
+
+Rem 大地图
+'判断章节
+
+
+
+EndScript
+
+//=============================
 '在战斗中?找"暂停".
 FindPic 1193,14,1265,85,"Attachment:暂停.png","202020",0,0.6,intx,inty
 If intx > -1 And inty > -1 Then
@@ -283,18 +358,7 @@ if arr(0)   then
 End If
 '=========停止脚本===============
 'EndScript
-/*
-'当条件成立时，进入循环，直到条件不成立，退出循环
-Do While arr(0) = -1
-    TracePrint "正在战斗中，等待....."
-    ShowMessage "正在战斗中，等待....."
-    A=array(229,459,279,510,"Attachment:win.png")
-    arr=GK.FullTM2(A,3)
-Delay 1000
-    TracePrint arr(0),arr(1),arr(2)
-Loop
-TracePrint "循环结束"
-*/
+
 Delay 2000
 TracePrint "获得道具,点击"
 Tap 300,300  '获得道具先点击一下,
