@@ -1,28 +1,18 @@
-'
+'模拟器参数
 'mumu 1280*720 240dpi 
 '极速+ 渲染加速
 '===================
-SetRowsNumber(0)
-'注意：每次制作完字库后，需要自行把制作的字库文件添加到脚本“附件”中
-TracePrint SetDictEx(0, "Attachment:mq_soft.txt")
-TracePrint UseDict(0)
-'以上两句脚本只需要调用一次
 Import "GK.lua" '
 Import "zm.luae" 
 zm.Init  //初始化,只需执行一次
-
 '=============定义变量================
 Dim intX,intY '坐标
 Dim t '时间,计秒
-Dim 找图
 Dim ret '找图
 Dim 次数=0 '记录刷小怪的次数
 Delay 500
 '===================================================================
 '========判断目前所在状态======
-
-'序号坐标图片名 = zm.FindPic([对象,][x1,y1,x2,y2,][图片][,偏色][,方向][,相似度][,智能相似度][,超时时间][,是否点击][,点击坐标][,显示日志][,输出行号][,备注][,等待消失][,消失超时][,参数返回值])
-
 ret = zm.FindPic("主页.png|大地图.png|切换.png|战斗中.png",2000, 0.9)
 If ret Then
     TracePrint "成功识别."
@@ -53,7 +43,6 @@ If ret Then
         
 Else
     TracePrint "什么都没有找到"
-    EndScript
 End If
 
 Rem 首页
@@ -74,26 +63,6 @@ If ret Then
     Goto 舰队选择
 	
 End If
-
-
-EndScript
-
-
-
-Rem 刷图中
-TracePrint "在刷图中,等待2秒,寻找杂鱼.... "
-Delay 2000
-Goto H4
-'==========================================================================================
-'在章节图?
-'判断是否在第3章; 范围内找数字3
-FindStr(3,84,101,125,"3","7BDFF7-151515|63CFF7-151515|39AAEF-151515|31AEDE-151515|29C7F7-151515",0.9,intX,intY)
-If intX > -1 And intY > -1 Then
-    TracePrint intX
-    TracePrint intY
-   
-End If
-'结束脚本
 EndScript
 
 Rem 舰队选择
@@ -171,6 +140,12 @@ TracePrint "调整画面."
 'showmessage "拖动画面到中间"
 Swipe 700, 170, 700, 100, 300 '用300毫秒,拖动画面,上移70像素..调整画面.
 Delay 1000
+
+Rem 刷图中
+TracePrint "在刷图中,等待2秒,寻找杂鱼.... "
+Delay 2000
+Goto H4
+
 Rem H4   '搜,小怪   4H
 If 次数 >= 3 Then 
     TracePrint "野生的BOSS出现了,快扔大师球."
@@ -308,16 +283,11 @@ Rem 战斗中
 TracePrint "战斗中..."
 Delay 15000
 TracePrint "找..."
-ret = zm.FindPic(210,451,288,521,"win.png",150000,"show",true)
+ret = zm.FindPic(201,447,292,543,"win.png",150000,"show",true)
 If ret then
     ShowMessage "胜利!!!"
     TracePrint "战斗结束.win"
-    Delay 100
-   
 End If
-'=========停止脚本===============
-EndScript
-
 Delay 1000
 TracePrint "获得道具,点击"
 Tap 300,300  '获得道具先点击一下,
