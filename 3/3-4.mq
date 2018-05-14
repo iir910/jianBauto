@@ -1,4 +1,5 @@
-'声明,调用.      '找字
+'声明,调用.      
+'找字
 SetRowsNumber(0)
 '注意：每次制作完字库后，需要自行把制作的字库文件添加到脚本“附件”中
 TracePrint SetDictEx(0, "Attachment:mq_soft.txt")
@@ -132,7 +133,7 @@ If 次数 >= 3 Then
     Delay 100
     Goto Boss
 End If
-FindColor 164,537,1125,571,"42CFEF",3,0.9,intX,intY '第4行
+FindColor 164,537,1125,571,"42CFEF",3,0.99,intX,intY '第4行
 If intX > -1 And intY > -1 Then
     次数 = 次数 + 1
     TracePrint "这是第"& 次数 &"次"
@@ -149,7 +150,7 @@ If 次数 >= 3 Then
     Delay 100
     Goto Boss
 End If
-FindColor 236,434,1136,460,"42CFEF",3,0.9,intX,intY '第3行
+FindColor 236,434,1136,460,"42CFEF",3,0.99,intX,intY '第3行
 If intX > -1 And intY > -1 Then
     次数 = 次数 + 1
     TracePrint "这是第"& 次数 &"次"
@@ -166,7 +167,7 @@ If 次数 >= 3 Then
     Delay 100
     Goto Boss
 End If
-FindColor 311,334,682,360,"42CFEF",3,0.9,intX,intY '第2行
+FindColor 311,334,682,360,"42CFEF",3,0.99,intX,intY '第2行
 If intX > -1 And intY > -1 Then
     次数 = 次数 + 1
     TracePrint "这是第"& 次数 &"次"
@@ -183,7 +184,7 @@ If 次数 >= 3 Then
     Delay 100
     Goto Boss
 End If
-FindColor 360,239,807,271,"42CFEF",3,0.9,intX,intY '第 1
+FindColor 360,239,807,271,"42CFEF",3,0.99,intX,intY '第 1
 If intX > -1 And intY > -1 Then
     次数 = 次数 + 1
     TracePrint "这是第"& 次数 &"次"
@@ -268,7 +269,7 @@ End If
 */
 Import "Thread.lua"
 '找胜利,并点击
-A=array(229,459,279,510,"Attachment:win.png")
+dim A=array(229,459,279,510,"Attachment:win.png")
 dim arr=GK.FullTM2(A,190)
 if arr(0)   then
     ShowMessage "胜利!!!"
