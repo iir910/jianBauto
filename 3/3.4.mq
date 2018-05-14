@@ -2,16 +2,14 @@
 'mumu 1280*720 240dpi 
 '极速+ 渲染加速
 '===================
-'声明,调用.      
-'找字
 SetRowsNumber(0)
 '注意：每次制作完字库后，需要自行把制作的字库文件添加到脚本“附件”中
 TracePrint SetDictEx(0, "Attachment:mq_soft.txt")
 TracePrint UseDict(0)
 '以上两句脚本只需要调用一次
-Import "GK.lua" '果壳插件  
-Import "zm.luae" '紫猫插件
-zm.Init  //初始化插件,只需执行一次
+Import "GK.lua" '
+Import "zm.luae" 
+zm.Init  //初始化,只需执行一次
 
 '=============定义变量================
 Dim intX,intY '坐标
@@ -25,92 +23,67 @@ Delay 500
 
 '序号坐标图片名 = zm.FindPic([对象,][x1,y1,x2,y2,][图片][,偏色][,方向][,相似度][,智能相似度][,超时时间][,是否点击][,点击坐标][,显示日志][,输出行号][,备注][,等待消失][,消失超时][,参数返回值])
 
-ret = zm.FindPic("主页.png|大地图.png|切换.png", 0.9)
-Dim x=ret(1)
-dim y=ret(2)
+ret = zm.FindPic("主页.png|大地图.png|切换.png|战斗中.png",2000, 0.9)
 If ret Then
-    TracePrint "可以用以下3种格式获取返回值"
-    TracePrint "找到序号" & ret(0), "x=" & ret(1), "y=" & ret(2), "图片名=" & ret(3)
-    TracePrint "找到序号" & ret[1], "x=" & ret[2], "y=" & ret[3], "图片名=" & ret[4]
+    TracePrint "成功识别."
     TracePrint "找到序号" & ret["id"], "x=" & ret["x"], "y=" & ret["y"], "图片名=" & ret["name"]
-    Goto 传送门
-    
+    Delay 100
+    If ret["name"] = "主页" Then 
+        TracePrint "在首页." 
+        Goto 首页 
+    End If
+    If ret["name"] = "大地图" Then 
+        TracePrint "在大地图." 
+        Goto 大地图 
+    End If
+    If ret["name"] = "战斗中" Then 
+        TracePrint "在战斗中 ."  
+        goto 战斗中
+    End If
+    If ret["name"] = "切换" Then 
+        TracePrint "在小地图 ." 
+         Goto 刷图中
+    End If
+    If ret["name"] = 4 Then 
+        TracePrint "在 ."   
+    End If
+    if ret["name"] = 5 Then 
+        TracePrint "在 ."  	 
+    End If
+        
 Else
-    TracePrint "没有找到"
-    
+    TracePrint "什么都没有找到"
+    EndScript
 End If
-
-EndScript
-
-Rem 传送门
-If ret(0) = 0 Then 
-	 TracePrint "在首页." 
-	 Goto 首页
-	 Else 
-	 EndScript 	 
-End If
-IIf ret(0) = 1 Then 
-	 TracePrint "在大地图." 
-	 	 Goto 大地图
-	 Else 
-	 EndScript 	 
-End If
-If ret(0) = 2 Then 
-	 TracePrint "在 ." 
-	 Else 
-	 EndScript 	 
-End If
-If ret(0) = 3 Then 
-	 TracePrint "在 ." 
-	 Else 
-	 EndScript 	 
-End If
-If ret(0) = 4 Then 
-	 TracePrint "在 ." 
-	 Else 
-	 EndScript 	 
-End If
-f ret(0) = 5 Then 
-	 TracePrint "在 ." 
-	 Else 
-	 EndScript 	 
-End If
-
-
-
-
-
-
-EndScript
 
 Rem 首页
+Delay 200
+zm.tap (774,368,934,434,1000,"show")
+
 EndScript
 
 Rem 大地图
 '判断章节
-
+ret = zm.FindPic("第3章.png", 0.9)
+If ret Then 
+    Delay 50
+    '点击3-4 的坐标
+    zm.Tap 581,337,644,396,1000 ,"show" '点击延时1s
+    zm.Tap 842,456,1016,509,1500 ,"show" 
+    
+    Goto 舰队选择
+	
+End If
 
 
 EndScript
 
-//=============================
-'在战斗中?找"暂停".
-FindPic 1193,14,1265,85,"Attachment:暂停.png","202020",0,0.6,intx,inty
-If intx > -1 And inty > -1 Then
-    TracePrint "在战斗中"
-    Goto 战斗中	
-End If
-TracePrint "不在战斗中"
-Delay 200
+
+
 Rem 刷图中
-Delay 1000
-FindPic 867,638,1024,699,"Attachment:切换队伍.png","202020",0,0.7,intx,inty
-If intx > -1 And inty > -1 Then
-    TracePrint "在刷图中,等待2秒,寻找杂鱼.... "
-    Delay  2000
-    Goto H4
-End If
-TracePrint "不在刷图中"
+TracePrint "在刷图中,等待2秒,寻找杂鱼.... "
+Delay 2000
+Goto H4
 '==========================================================================================
 '在章节图?
 '判断是否在第3章; 范围内找数字3
@@ -118,19 +91,11 @@ FindStr(3,84,101,125,"3","7BDFF7-151515|63CFF7-151515|39AAEF-151515|31AEDE-15151
 If intX > -1 And intY > -1 Then
     TracePrint intX
     TracePrint intY
-    Delay 50
-    ShowMessage "在第3章\n点击3-4", 1000,560,600
-    Delay 50
-    '点击3-4 的坐标
-    ShowMessage "选择3-4", 1000, 560,600
-    Tap 610, 360
-    Delay 1000
-    Tap 900, 500
-    ShowMessage "立刻前往", 1000, 560,600
-    Goto 舰队选择
+   
 End If
 '结束脚本
 EndScript
+
 Rem 舰队选择
 TracePrint "舰队选择"
 Delay 1500
@@ -293,31 +258,36 @@ for t
 next
 '判断在"出击"否
 Rem 出击
-FindStr(1047,600,1157,659,"出击","DEF7FF-151515|84D7FF-202020|B5EFFF-202020|42CFEF-202020|63BADE-202020",0.7,cjX,cjY)
-If cjX > -1 And cjY > -1 Then
-    TracePrint "在出击界面",cjx
+ret = zm.FindPic(897,562,1224,706,"出击.png", 0.9)
+If ret Then 
+    TracePrint "成功识别: 在 编队出击"
+    TracePrint "找到序号" & ret["id"], "x=" & ret["x"], "y=" & ret["y"], "图片名=" & ret["name"]
     delay 100
     '检查自律on
-    FindStr(161,77,190,101,"on","4AF7AD-151515",0.8,intX,intY)
-    If intX > -1 And intY > -1 Then
-        TracePrint "自律-打开"
-    Else '调成自律模式
-        TracePrint "自律-关闭",intX,intY
+    If zm.FindColor(121, 79, 190, 103, "4AF7AD-050505", "下右", 1.0, "show", "@@自律.检查") Then 
+
+         Else 
+        '调成自律模式"
+        TracePrint "自律-关"
         delay 100
-        Tap 180,100
-        Delay 300
+        zm.tap (121,79,190,103,"show")
         TracePrint "自律-打开"
         Delay 400
         Tap 600,80 '关闭提示界面
     End If
-    TracePrint "点击出击",cjx,cjy
-    Tap 1060, 600
+
+    TracePrint "点击出击"
+    zm.Tap (917,586,1200,688,"show","@出击")
     t=40
     Goto 战斗中
-    Else TracePrint "不在出击?"
+Else 
+    TracePrint "不在出击?"
     Goto 遇到伏击
 End If
 EndScript
+
+
+
 Rem 遇到伏击
 Delay 2000
 FindPic 210,424,466,502,"Attachment:伏击.png","050505",0,0.9,intX,intY
@@ -331,58 +301,44 @@ Else
     Delay 100
     Goto H4
 End If
+
+
 Rem 战斗中
-/*
-for t
-t=t-1
-showmessage "战斗中,等待" & cstr(t) & "秒"
-delay 1000
-next
-FindStr(231,464,275,507,"","4AE36B-353535|00A608-353535",0.9,intX,intY)
-If intX > -1 And intY > -1 Then
-	TracePrint intX
-	TracePrint intY
-	Else TracePrint "继续等待"
-	t=10
-End If
-*/
-Import "Thread.lua"
-'找胜利,并点击
-dim A=array(229,459,279,510,"Attachment:win.png")
-dim arr=GK.FullTM2(A,190)
-if arr(0)   then
+'等消失
+TracePrint "战斗中..."
+Delay 15000
+TracePrint "找..."
+ret = zm.FindPic(210,451,288,521,"win.png",150000,"show",true)
+If ret then
     ShowMessage "胜利!!!"
     TracePrint "战斗结束.win"
     Delay 100
-    TracePrint arr(0),arr(1),arr(2)
+   
 End If
 '=========停止脚本===============
-'EndScript
+EndScript
 
-Delay 2000
+Delay 1000
 TracePrint "获得道具,点击"
 Tap 300,300  '获得道具先点击一下,
 Delay 2000
-找图=array("Attachment:jn.png","202020",0,0.6,false)
-If Gk.Full(找图) Then 
-    TracePrint Gk.Full(找图)
+if zm.FindPic(981,554,1064,646,"性能.png",0.8,"show") then
     Delay 1000
-    TracePrint "获得卡片,点一下"
-    Tap 300,100 '获得卡片,点一下
+    TracePrint "获得卡片"
+    zm.Tap (335,92,788,410,2000) 
 Else 
     TracePrint "没有获得卡片"
 End If
 Delay 1000
-ShowMessage "经验结算"
+ShowMessage "经验结算.完毕"
 Delay 2200
-Tap 1100,600 '获得经验,确认完毕.
+zm.Tap (1025,581,1197,635,2500) '获得经验,确认完毕.
 /*
 t=4
 for t
-t=t-1
-showmessage "倒计时" & cstr(t) & "秒后,返回刷图"
-delay 1000
+    t=t-1
+    showmessage "倒计时" & cstr(t) & "秒后,返回刷图"
+    delay 1000
 Next
 */
-Delay 2500
 Goto 刷图中
