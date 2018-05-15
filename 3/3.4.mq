@@ -9,6 +9,7 @@ Dim t '时间,计秒
 Dim ret '找图
 Dim 次数=0 '记录刷小怪的次数
 Delay 100
+zm.SetTap {"minx":-30, "maxx":8, "miny":-35, "maxy":5} '设置固定坐标x浮动范围[-10,15], 固定坐标y浮动范围[-5,20], 点击后默认延时2000毫秒
 '========判断目前所在状态============================================
 ret = zm.FindPic("主页.png|大地图.png|切换.png|战斗中.png",2000, 0.9)
 If ret Then
@@ -48,6 +49,16 @@ zm.tap 993, 361, 1191, 441, 1000, "show", "@@在首页."
 
 
 Rem 大地图
+Delay 1000
+FindPic 547,467,733,528,"Attachment:紧急委托.png","202020",1,0.9,intX,intY
+If intX > -1 And intY > -1 Then
+	TracePrint "紧急委托"
+	ShowMessage "紧急委托"
+	Delay 100
+	zm.Tap (547,467,733,528)
+End If
+
+
 '判断章节
 ret = zm.FindPic("第3章.png", 0.9)
 If ret Then 
@@ -127,6 +138,15 @@ Swipe  716, 182,713, 112, dt '用 dt 毫秒,拖动画面,上移70像素..调整画面.
 zm.delay(200,1000)
 
 Rem 刷图中
+Delay 1000
+FindPic 547,467,733,528,"Attachment:紧急委托.png","202020",1,0.9,intX,intY
+If intX > -1 And intY > -1 Then
+	TracePrint "紧急委托"
+	ShowMessage "紧急委托"
+	Delay 100
+	zm.Tap (547,467,733,528)
+End If
+
 TracePrint "在刷图中,等待0.5秒,寻找杂鱼.... "
 zm.delay(200,1000)
 Goto H4
@@ -148,8 +168,6 @@ Else
         Goto 移动中
     else
         TracePrint intX,intY,"第4行里,没发现杂鱼...."
-        
-  
         goto H3	
     End If
 End If
@@ -222,9 +240,22 @@ Rem boss  '检查boss颜色.
 FindColor 1120,371,1207,546,"524DFF",1,0.99,intX,intY
 If intX > -1 And intY > -1 Then
     TracePrint "找到boss位置!!!果断推倒!!"
+    '- 检查 有没有被拦住 
+    FindColor 1031,542,1114,571,"29C7FF-202020",1,0.9,intX,intY
+    If intX > -1 And intY > -1 Then
+        TracePrint intX
+        TracePrint "被拦住 " 
+        ShowMessage "被拦住 "
+        
+        Goto 移动中
+        
+    End If
+    FindColor 1120,371,1207,546,"524DFF",1,0.99,intX,intY
     次数 = 0
-    TracePrint "重置次数"
+    TracePrint "重置次数=0"
     '- 补充弹药
+    
+    
     
     Goto 移动中
     
@@ -380,7 +411,7 @@ ShowMessage "次数="&次数
 If 次数 > 0 Then  
     Goto 刷图中
 Else 
-Delay 1500
+    Delay 1500
     Goto 大地图
 End If
 

@@ -16,4 +16,11 @@ fix.修复:
 :
 [\u4E00-\u9FCC]:
 :
- 
+
+
+ t=5  '定义等待时间,5秒
+for t 
+    t=t-1
+    showmessage "等待" & cstr(t) & "秒"
+    delay 1000
+Next
