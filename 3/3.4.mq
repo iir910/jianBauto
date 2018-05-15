@@ -46,6 +46,7 @@ Rem 首页
 Delay 200
 zm.tap 993, 361, 1191, 441, 1000, "show", "@@在首页."
 
+
 Rem 大地图
 '判断章节
 ret = zm.FindPic("第3章.png", 0.9)
@@ -66,48 +67,49 @@ End If
 Rem 舰队选择
 TracePrint "舰队选择"
 Delay 1500
-If ret=zm.FindColor (256,549,381,585,"188AF7",0.8) Then
+If zm.FindColor (256,549,381,585,"188AF7",0.8,"show") Then '1
     ShowMessage "第1舰队.已选"
     TracePrint "第1舰队.已选"
     '判断有没有两支队伍
     '找2队
-    Delay 500    
-End If '1
-If ret=zm.FindColor (256,549,381,585,"188AF7",0.8) Then
+    zm.Delay (500,1000)    
+End If 
+If zm.FindColor (395,545,527,582,"188AF7",0.8,"show") Then '2
     TracePrint "第2舰队.已选"
     ShowMessage "第2舰队.已选"
    
     '取消选择
     zm.Tap (395,545,527,582)
-    TracePrint "取消2"
+    TracePrint "手动取消2"
+    zm.Delay (500,1000)  
 Else 
     TracePrint "第2舰队.取消"
     ShowMessage "第2舰队.取消", 1000, 560,600
     Delay 500
          
 End If '2
-If ret=zm.FindColor (256,549,381,585,"188AF7",0.8) Then
+If zm.FindColor (542,543,672,582,"188AF7",0.8,"show") Then '3
     TracePrint "第3舰队.已选"
     ShowMessage "第3舰队.已选"
     '取消选择
     zm.Tap (542,543,672,582)
-    TracePrint "取消3"
+    TracePrint "手动取消3"
 Else 
     TracePrint "第3舰队.取消"
     ShowMessage "第3舰队.取消", 1000, 560,600
     Delay 500
-End If
-If ret=zm.FindColor (256,549,381,585,"188AF7",0.8) Then
+End If '3
+If zm.FindColor (683,549,815,582,"188AF7",0.8) Then '4
     TracePrint "第4舰队.已选"
     ShowMessage "第4舰队.已选"
  
     '取消选择
     zm.Tap (683,549,815,582)
-    TracePrint "取消4"
+    TracePrint "手动取消4"
 Else 
     TracePrint "第4舰队.取消"
     ShowMessage "第4舰队.取消", 1000, 560,600 
-End If 	
+End If 	'4
 Delay 1000
 '-
 Tap 960, 560
@@ -319,7 +321,7 @@ If ret Then
             Delay 100
             Tap intx, inty
             TracePrint "继续原来的目标" 
-            Delay 1000
+            Delay 2500
             Goto 出击
         End If
     End If
@@ -356,14 +358,14 @@ Else
     EndScript
     
 End If
-Delay 1000
+Delay 500
 TracePrint "获得道具,点击"
-Tap 300,300  '获得道具先点击一下,
-  zm.Delay (1500,2500) 
-If zm.FindPic(934, 532, 1088, 680, "性能.png", 0.9,true,"@@判断是否获得卡片") Then 
+zm.Tap (472,507,811,681) '获得道具先点击一下,
+zm.Delay (1500,2500) 
+If zm.FindPic(934, 532, 1088, 680, "性能.png", 0.9,"@@判断是否获得卡片") Then 
     'TracePrint "获得卡片"
     zm.Delay (1500,2500) 
-    zm.Tap (335,92,788,410,2000)  '点击空白处
+    zm.Tap (335,92,788,410,1100)  '点击空白处
     TracePrint "点击空白处"
 Else 
     TracePrint "没有获得 卡片"
@@ -371,9 +373,17 @@ End If
 ShowMessage "经验结算"
 zm.Delay (2000,3000)
 zm.Tap (1025,581,1197,635,2500) '获得经验,确认完毕.
-   TracePrint "获得经验,确认完毕"
-zm.Delay (2000,2100)
-Goto 刷图中
+TracePrint "获得经验,确认完毕"
+zm.Delay 2000, 2100
+TracePrint "次数="&次数
+ShowMessage "次数="&次数
+If 次数 > 0 Then  
+    Goto 刷图中
+Else 
+Delay 1500
+    Goto 大地图
+End If
+
 /*
 t=4
 for t
