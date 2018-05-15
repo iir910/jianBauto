@@ -32,96 +32,87 @@ If ret Then
     End If
     If ret["name"] = "切换" Then 
         TracePrint "在小地图 ." 
-         Goto 刷图中
+        Goto 刷图中
     End If
     If ret["name"] = 4 Then 
         TracePrint "在 ."   
     End If
     if ret["name"] = 5 Then 
         TracePrint "在 ."  	 
-    End If
-        
+    End If        
 Else
     TracePrint "什么都没有找到"
 End If
+EndScript
 
 Rem 首页
 Delay 200
-zm.tap (774,368,934,434,1000,"show")
-
-EndScript
-
+zm.tap (993,361,1191,441,1000,"show")
 Rem 大地图
 '判断章节
 ret = zm.FindPic("第3章.png", 0.9)
 If ret Then 
-    Delay 50
+    Delay 100
     '点击3-4 的坐标
     zm.Tap 581,337,644,396,1000 ,"show" '点击延时1s
-    zm.Tap 842,456,1016,509,1500 ,"show" 
-    
+    zm.Tap 842,456,1016,509,1500 ,"show"  
     Goto 舰队选择
-	
+Else 
+    TracePrint "不是3"
+    '  " 选择章节"
 End If
 EndScript
 
 Rem 舰队选择
 TracePrint "舰队选择"
 Delay 1500
-Dim X1,Y1
-FindColor 357,558,384,581,"188AF7",0,0.8,X1,Y1
-If X1 > -1 And Y1 > -1 Then
+ret=zm.FindColor (357,558,384,581,"188AF7",0.8)
+If ret Then
     ShowMessage "第一舰队已经选择", 1000, 560,600
     TracePrint "第一舰队已经选择"
     '判断有没有两支队伍
     '找2队
-    Delay 1500
-    Dim x2,y2
-    FindColor 507,553,528,580,"188AF7",0,0.8,x2,y2
-    If x2 > -1 And y2 > -1 Then 
-        TracePrint "第2舰队 ok"
-        ShowMessage "第2舰队 ok", 1000, 560,600
-        TracePrint x2
-        TracePrint y2
-        '取消选择
-        Tap x2, y2
-        TracePrint "取消2"
-    Else 
-        TracePrint "第2舰队 no"
-        ShowMessage "第2舰队 no", 1000, 560,600
-        Delay 1500
-        Dim x3,y3
-        FindColor 649,557,669,577,"188AF7",0,0.8,x3,y3
-        If x3 > -1 And y3 > -1 Then 
-            TracePrint "第3舰队 ok"
-            ShowMessage "第3舰队 ok", 1000, 560,600
-            TracePrint x3
-            TracePrint y3
-            '取消选择
-            Tap x3, y3
-            TracePrint "取消3"
-        Else 
-            TracePrint "第3舰队 no"
-            ShowMessage "第3舰队 no", 1000, 560,600
-            Delay 1500
-            Dim x4,y4
-            FindColor 791,555,813,579,"188AF7",0,0.8,x4,y4
-            If x4 > -1 And y4 > -1 Then 
-                TracePrint "第4舰队 ok"
-                ShowMessage "第4舰队 ok", 1000, 560,600
-                TracePrint x4
-                TracePrint y4
-                '取消选择
-                Tap x4, y4
-                TracePrint "取消4"
-            Else 
-                TracePrint "第4舰队 no"
-                ShowMessage "第4舰队 no", 1000, 560,600 
-            End If   '4
-        End If '3  
-    End If '2
+    Delay 500    
 End If '1
-	
+ret=zm.FindColor (507,553,528,580,"188AF7",0.8)
+If ret Then
+    TracePrint "第2舰队 ok"
+    ShowMessage "第2舰队 ok", 1000, 560,600
+   
+    '取消选择
+    zm.Tap (401,546,525,584)
+    TracePrint "取消2"
+Else 
+    TracePrint "第2舰队 no"
+    ShowMessage "第2舰队 no", 1000, 560,600
+    Delay 1500
+         
+End If '2
+ret=zm.FindColor (649,557,669,577,"188AF7",0.8)
+If ret Then
+    TracePrint "第3舰队 ok"
+    ShowMessage "第3舰队 ok", 1000, 560,600
+    '取消选择
+    zm.Tap (549,545,666,587)
+    TracePrint "取消3"
+Else 
+    TracePrint "第3舰队 no"
+    ShowMessage "第3舰队 no", 1000, 560,600
+    Delay 1500
+End If
+ret=zm.FindColor (649,557,669,577,"188AF7",0.8)
+
+If ret Then
+    TracePrint "第4舰队 ok"
+    ShowMessage "第4舰队 ok", 1000, 560,600
+ 
+    '取消选择
+    zm.Tap (687,548,814,582)
+    TracePrint "取消4"
+Else 
+    TracePrint "第4舰队 no"
+    ShowMessage "第4舰队 no", 1000, 560,600 
+End If 	
 '立即前往
 Delay 1000
 Tap 960, 560
@@ -147,22 +138,26 @@ Delay 2000
 Goto H4
 
 Rem H4   '搜,小怪   4H
+TracePrint "搜索中.... "
 If 次数 >= 3 Then 
     TracePrint "野生的BOSS出现了,快扔大师球."
     Delay 100
     Goto Boss
-End If
-FindColor 164,537,1125,571,"42CFEF",3,0.99,intX,intY '第4行
-If intX > -1 And intY > -1 Then
-    次数 = 次数 + 1
-    TracePrint "这是第"& 次数 &"次"
-    TracePrint "发现杂鱼",intX,intY
-    Delay 200
+Else 
+    FindColor 164,537,1125,571,"42CFEF",3,0.99,intX,intY '第4行
+    TracePrint "扫4.. "
+    If intX > -1 And intY > -1 Then
+        次数 = 次数 + 1
+        TracePrint "这是第"& 次数 &"次"
+        TracePrint "发现杂鱼",intX,intY
+        Delay 200
     
-    TracePrint intX,intY,"第4行里,没发现杂鱼...."
-    Goto 移动中
-    Else goto H3	
+        TracePrint intX,intY,"第4行里,没发现杂鱼...."
+        Goto 移动中
+        Else goto H3	
+    End If
 End If
+
 Rem H3  '搜,小怪   3H
 If 次数 >= 3 Then 
     TracePrint "野生的BOSS出现了,快扔大师球."
@@ -186,7 +181,7 @@ If 次数 >= 3 Then
     Delay 100
     Goto Boss
 End If
-FindColor 311,334,682,360,"42CFEF",3,0.99,intX,intY '第2行
+FindColor 239,325,807,370,"42CFEF",3,0.99,intX,intY '第2行
 If intX > -1 And intY > -1 Then
     次数 = 次数 + 1
     TracePrint "这是第"& 次数 &"次"
@@ -209,10 +204,10 @@ If intX > -1 And intY > -1 Then
     TracePrint "这是第"& 次数 &"次"
     TracePrint "发现杂鱼",intX,intY
     Delay 200
-    
     TracePrint intX,intY,"第1行里,没发现杂鱼...."
     Goto 移动中
     Delay 2000
+    TracePrint "重复...再搜一次"
     Else goto H4	
 End If
 Rem boss  '检查boss颜色.
@@ -223,14 +218,42 @@ If intX > -1 And intY > -1 Then
     TracePrint "找到boss位置!!!果断推倒!!"
     goto 移动中
 End If
+
+EndScript
 Rem 移动中
-Tap intx,inty
-t=3
-for t
-    t=t-1
-    showmessage "移动倒计时" & cstr(t) & "秒"
-    delay 2000
-next
+
+Tap intx, inty
+Delay 1000
+'检查 消失
+if zm.FindPic( 829, 627, 1056, 705, "切换.png", 0.8, -2, -6000, "show") Then
+
+    Delay 2000
+Else 
+    EndScript
+End If
+'找图,判断状态.
+ret=zm.FindPic ("出击.png|伏击.png|切换.png", 0.9)
+If ret Then 
+    'TracePrint "找到序号" & ret["id"], "x=" & ret["x"], "y=" & ret["y"], "图片名=" & ret["name"]
+		
+    Delay 100
+    If ret["name"] = "出击" Then 
+        TracePrint "在出击." 
+        Goto 出击
+    End If
+    If ret["name"] = "切换" Then 
+        TracePrint "在小地图." 
+        Goto 刷图中
+	
+    End If
+    If ret["name"] = "伏击" Then 
+        TracePrint "遇到伏击" 
+        Goto 遇到伏击 
+	
+    End If
+End If
+EndScript
+
 '判断在"出击"否
 Rem 出击
 ret = zm.FindPic(897,562,1224,706,"出击.png", 0.9)
@@ -241,7 +264,7 @@ If ret Then
     '检查自律on
     If zm.FindColor(121, 79, 190, 103, "4AF7AD-050505", "下右", 1.0, "show", "@@自律.检查") Then 
 
-         Else 
+    Else 
         '调成自律模式"
         TracePrint "自律-关"
         delay 100
@@ -265,8 +288,8 @@ EndScript
 
 Rem 遇到伏击
 Delay 2000
-FindPic 210,424,466,502,"Attachment:伏击.png","050505",0,0.9,intX,intY
-If intX > -1 And intY > -1 Then
+ret = zm.FindPic(201,426,468,495,"出击.png|伏击.png|切换.png", 0.9)
+If ret then
     TracePrint intX
     TracePrint "遇到伏击"
     Tap 900,400 '规避
@@ -287,12 +310,16 @@ ret = zm.FindPic(201,447,292,543,"win.png",150000,"show",true)
 If ret then
     ShowMessage "胜利!!!"
     TracePrint "战斗结束.win"
+Else 
+    TracePrint "战斗...超时..."
+    EndScript
+    
 End If
 Delay 1000
 TracePrint "获得道具,点击"
 Tap 300,300  '获得道具先点击一下,
-Delay 2000
-if zm.FindPic(981,554,1064,646,"性能.png",0.8,"show") then
+Delay 1000
+if zm.FindPic(934,532,1088,680,"性能.png",0.8,"show") then
     Delay 1000
     TracePrint "获得卡片"
     zm.Tap (335,92,788,410,2000) 
@@ -301,8 +328,10 @@ Else
 End If
 Delay 1000
 ShowMessage "经验结算.完毕"
-Delay 2200
+Delay 1000
 zm.Tap (1025,581,1197,635,2500) '获得经验,确认完毕.
+
+Goto 刷图中
 /*
 t=4
 for t
@@ -311,4 +340,3 @@ for t
     delay 1000
 Next
 */
-Goto 刷图中
