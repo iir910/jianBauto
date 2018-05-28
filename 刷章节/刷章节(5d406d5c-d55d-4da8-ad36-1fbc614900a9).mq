@@ -1,0 +1,664 @@
+'模拟器参数: mumu 1280*720 240dpi 极速+ 渲染加速
+'===================
+Import "zm.luae" 
+zm.Init  //初始化,只需执行一次
+Import "Thread.lua"
+'=============定义变量================
+Dim intX,intY '坐标
+Dim dt '延时
+Dim t '时间,计秒
+Dim ret '找图
+Dim dx,dy '信息位置的坐标
+dx=200
+dy = 615
+Dim lv
+Dim 次数=0 '记录刷小怪的次数
+Dim 章节=ReadUIConfig ("章")&"-"&ReadUIConfig ("节")
+Dim 章=ReadUIConfig ("章")
+Dim 节=ReadUIConfig ("节")
+zm.SetTap {"minx":-12, "maxx":1, "miny":-12, "maxy":2, "showlog":"显示"}
+zm.SetFindStr {"showlog":"显示", "timeout":10}
+zm.setFindPic {"showlog":"显示", "timeout	":10}
+'==========================
+SetDictEx(0, "Attachment:mq_soft.txt")
+'===========获取UI设置=================
+TracePrint "~~~~~~~~UI 设置: 章节： "&章节
+TracePrint "~~~~~~~~多选框_优先BOSS: ",ReadUIConfig("多选框_优先BOSS")
+//======================================================
+'Thread.Start  tt
+ret = zm.FindPic("主页.png|map.png|切换.png|战斗中.png", "202020", 2500, 0.75, "show")
+'TracePrint "找到图像" & ret["id"], "x=" & ret["x"], "y=" & ret["y"], "图片名=" & ret["name"]
+Select Case ret[4]
+Case "主页" 
+    TracePrint "在首页." 
+    Delay 200
+    zm.tap 993, 361, 1191, 441, 1000 '点击 出击1
+case"map"  
+    TracePrint "在map." 
+    '  Goto map
+    goto map
+case"战斗中"  
+    TracePrint "在战斗中 ."  
+    战斗中
+case"切换"  
+    TracePrint "在map_s .局部地图" 
+    goto map2_3
+    ' Goto 索敌
+Case Else
+    TracePrint "什么都没有找到"
+    EndScript
+End Select
+Rem map '大地图
+wt 
+Delay 1000
+'ret = zm.FindPic("紧急委托.png|map.png|切换.png", 5000, 0.8)
+'TracePrint "找到图像" & ret["id"], "x=" & ret["x"], "y=" & ret["y"], "图片名=" & ret["name","_65"]
+//If ret Then 
+//    Select Case ret[4]
+//    Case "紧急委托"
+//        TracePrint "关闭信息" 
+//        zm.tap 926, 185
+//        Delay 1500
+//    Case "map"
+//        TracePrint "在map." 
+//    Case "切换"
+//        TracePrint "在s地图, 自动选择所需的地图" 
+//        Select Case 章节
+//        Case "1-1"
+//        Case "1-2"
+//        Case "1-3"
+//        Case "1-4"
+//            '  Goto map1_4
+//        Case "2-1"
+//        Case "2-2"
+//        Case "2-3"
+//            TracePrint "选择了2-3"
+//            Goto map2_3 
+//        Case "2-4"
+//        Case "3-1"
+//        Case "3-2"
+//        Case "3-3"
+//        Case "3-4"
+//        Case "4-1"
+//        Case "4-2"
+//        Case "4-3"
+//        Case "4-4"
+//        Case "5-1"
+//        Case "5-2"
+//        Case "5-3"
+//        Case "5-4"
+//        Case "6-1"
+//        Case "6-2"
+//        Case "6-3"
+//        Case "6-4"
+//        Case "7-1"
+//        Case "7-2"
+//        Case "7-3"
+//        Case "7-4"
+//        Case "8-1"
+//        Case "8-2"
+//        Case "8-3"
+//        Case "8-4"
+//        Case "9-1"
+//        Case "9-2"
+//        Case "9-3"
+//        Case "9-4"
+//        Case "10-1"
+//        Case "10-2"
+//        Case "10-3"
+//        Case "10-4"
+//        Case "11-1"
+//        Case "11-2"
+//        Case "11-3"
+//        Case "11-4"
+//        Case "12-1"
+//        Case "12-2"
+//        Case "12-3"
+//        Case "12-4"
+//        Case Else '===
+//            TracePrint "----- "
+//            EndScript
+//        End Select
+//    case Else 
+//        TracePrint "都否"
+//    End Select
+//Else 
+//    TracePrint "----"
+//    EndScript
+//End If
+//Delay 1000
+'判断章节
+ret =zm.FindStr(25,81,76,132,"1|2|3|4|5|6|7","6BCFDE-303030|4AB6E7-303030|31A6E7-303030|29C7FF-303030","mq_soft.txt",0.91)
+TracePrint "目前所在,第"&ret[4]&"章"
+'移动到所需的地图 : 求差, 绝对值
+dim dc = ret[4] - 章
+Dim dcc = abs(dc) 
+TracePrint "dc="&dc
+dim i=0 
+For dcc
+    TracePrint "还需要点击"&dcc-i&"次"
+    i=i+1
+    If dc > 0 Then 
+        Tap 60,360	
+    ElseIf dc < 0 Then
+        tap 1210,360
+    End If 
+    Delay 1000
+Next
+TracePrint "到达目标 ,第"&章&"章"
+call info("到达目标 ,第"&章&"章")
+Call gomap()
+Delay 1500
+zm.Tap 842,456,1016,509,1000  '点击"立刻前往",延时1s
+Call 舰队选择()
+zm.Tap 960, 560
+TracePrint "点击 {立即前往} "
+
+'-------------------
+Select Case 章节
+        Case "1-1"
+        Case "1-2"
+        Case "1-3"
+        Case "1-4"
+            '  Goto map1_4
+        Case "2-1"
+        Case "2-2"
+        Case "2-3"
+            TracePrint "选择了2-3"
+            Goto map2_3 
+        Case "2-4"
+        Case "3-1"
+        Case "3-2"
+        Case "3-3"
+        Case "3-4"
+        Case "4-1"
+        Case "4-2"
+        Case "4-3"
+        Case "4-4"
+        Case "5-1"
+        Case "5-2"
+        Case "5-3"
+        Case "5-4"
+        Case "6-1"
+        Case "6-2"
+        Case "6-3"
+        Case "6-4"
+        Case "7-1"
+        Case "7-2"
+        Case "7-3"
+        Case "7-4"
+        Case "8-1"
+        Case "8-2"
+        Case "8-3"
+        Case "8-4"
+        Case "9-1"
+        Case "9-2"
+        Case "9-3"
+        Case "9-4"
+        Case "10-1"
+        Case "10-2"
+        Case "10-3"
+        Case "10-4"
+        Case "11-1"
+        Case "11-2"
+        Case "11-3"
+        Case "11-4"
+        Case "12-1"
+        Case "12-2"
+        Case "12-3"
+        Case "12-4"
+        Case Else '===
+            TracePrint "----- "
+            EndScript
+        End Select
+
+
+
+
+
+
+'...........................?????
+For i = 1 To 4
+    Call info("等待" & 5 - i & "秒")
+    Delay 1000
+Next
+
+// Select Case ret[4]
+//    Case "紧急委托"
+//        TracePrint "关闭信息" 
+//        zm.tap 926, 185
+//        Delay 1500
+//    Case "map"
+//        TracePrint "在map." 
+//    Case "切换"
+//        TracePrint "在s地图, 自动选择所需的地图" 
+//        Select Case 章节
+//        Case "1-1"
+//        Case "1-2"
+//        Case "1-3"
+//        Case "1-4"
+//            '  Goto map1_4
+//        Case "2-1"
+//        Case "2-2"
+//        Case "2-3"
+//            TracePrint "选择了2-3"
+//            Goto map2_3 
+//        Case "2-4"
+//        Case "3-1"
+//        Case "3-2"
+//        Case "3-3"
+//        Case "3-4"
+//        Case "4-1"
+//        Case "4-2"
+//        Case "4-3"
+//        Case "4-4"
+//        Case "5-1"
+//        Case "5-2"
+//        Case "5-3"
+//        Case "5-4"
+//        Case "6-1"
+//        Case "6-2"
+//        Case "6-3"
+//        Case "6-4"
+//        Case "7-1"
+//        Case "7-2"
+//        Case "7-3"
+//        Case "7-4"
+//        Case "8-1"
+//        Case "8-2"
+//        Case "8-3"
+//        Case "8-4"
+//        Case "9-1"
+//        Case "9-2"
+//        Case "9-3"
+//        Case "9-4"
+//        Case "10-1"
+//        Case "10-2"
+//        Case "10-3"
+//        Case "10-4"
+//        Case "11-1"
+//        Case "11-2"
+//        Case "11-3"
+//        Case "11-4"
+//        Case "12-1"
+//        Case "12-2"
+//        Case "12-3"
+//        Case "12-4"
+//        Case Else '===
+//            TracePrint "----- "
+//            EndScript
+//        End Select
+//    case Else 
+//        TracePrint "都否"
+//    End Select
+//
+
+
+
+
+
+'==============================
+Rem map2_3
+Call wt()
+TracePrint "索敌"
+TracePrint "继续..B2"
+If  slv(486, 242, 539, 281) Then 
+    移动中
+End If
+TracePrint "继续..C3"
+If slv (600, 322, 654, 368)  Then 
+    移动中
+End If
+TracePrint "继续..D2"
+If slv(712, 236, 785, 287) Then 
+TracePrint slv(712, 236, 785, 287)
+    移动中
+End If
+TracePrint "继续..C1"
+If slv(587, 151, 673, 202) Then 
+TracePrint slv(587, 151, 673, 202)
+    移动中
+End If
+TracePrint "继续..D4,E4,E5"
+If slv(716,403,946,572) Then 
+    移动中 
+Else 
+    TracePrint "00"
+    EndScript
+End If
+//====================================================
+//Goto 章节3_4
+//'-
+//Rem 章节3_4
+//zm.Delay (3000,5000)
+//TracePrint "调整画面."
+//'showmessage "拖动画面到中间"
+//'-  特征明显,需改.
+//dt=zm.delay(200,900)
+//Swipe  716, 182,713, 112, dt '用 dt 毫秒,拖动画面,上移70像素..调整画面.
+//zm.delay 200, 1000
+//Rem 索敌
+Function 移动中
+    zm.Tap lv[2], lv[3] ' 移动---
+    TracePrint "开始移动.........",lv[2], lv[3]
+    Call info("闪一下?")
+    zm.Delay 50 '点击后会闪一下?
+    '检查 消失
+    //
+    ret = zm.FindPic(829, 628, 1057, 714, "切换.png", "101010", 0.80, -2, -8000, "show")
+    if ret Then
+        TracePrint "切换.png,====== 图片已经消失"
+        Delay 3000
+        TracePrint "延时3000"
+        '找图,判断状态.
+        ret = zm.FindPic("出击.png|伏击.png|切换.png", "151515", 8000, 0.7, "show")
+        if ret Then
+            Select Case ret[4]
+            Case "出击"
+                TracePrint "在出击." 
+                出击
+            Case "切换"
+                TracePrint "还在map_s.再移动." 
+                移动中
+            Case "伏击"
+                TracePrint "遇到伏击" 
+                遇到伏击 
+            End Select
+        Else 
+            TracePrint "找不到,判断不了状态?........"
+        End If
+    Else 
+        TracePrint "找不到 切换png, 在出击?"
+        ret = zm.FindPic("出击.png|伏击.png|切换.png", "151515", 8000, 0.7, "show")
+        if ret Then
+            Select Case ret[4]
+            Case "出击"
+                TracePrint "在出击." 
+                出击
+            Case "切换"
+                TracePrint "还在map_s.再移动." 
+                移动中
+            Case "伏击"
+                TracePrint "遇到伏击" 
+                遇到伏击 
+            End Select
+        Else 
+            TracePrint "找不到,判断不了状态?........"
+        End If
+    End If
+End Function
+'
+Function 遇到伏击
+    zm.Tap 900,400 ' 点击" 规避  " 
+    Delay 500
+    If zm.FindPic("出击.png|切换.png", 0.8, 3000) Then '规避成功否??
+        Select Case zm.FindPic[4]
+        Case "出击"
+            TracePrint "规避失败.{出击2}"
+            出击
+        case "切换"
+            TracePrint "规避成功."
+            Delay 200
+            'zm.Tap lv[2], lv[3]
+            TracePrint "继续原来的目标" 
+            Delay 500
+            移动中 
+        Case Else
+            TracePrint "错误!!!"
+        End Select
+    End If
+End Function
+Function 出击   
+    If zm.FindColor(121, 79, 190, 103, "4AF7AD-050505", "下右", 1.0, "show") Then  '检查自律on
+        TracePrint "自律 已打开"
+    Else '调成自律模式"
+        'TracePrint "自律-关"
+        zm.tap (121,79,190,103,"show")
+        TracePrint "修改=  自律-打开"
+        Delay 300
+        zm.Tap 600,80 '关闭提示界面
+    End If
+    Delay 500
+    TracePrint "点击出击"
+    zm.Tap 939,594,1185,674, "show", "@出击"
+    ret = zm.FindPic("整理船坞.png","151515",1000, 0.8) '需要 整理卡片?
+    If ret Then
+        TracePrint "找到图像" & ret["id"], "x=" & ret["x"], "y=" & ret["y"], "图片名=" & ret["name"]
+        Delay 100
+        Call 整理船坞()
+        Delay 300
+        zm.Tap 917, 586, 1200, 688, "show","@@返回 {出击2}"
+    End If 
+    战斗中
+End Function
+Function 战斗中
+    '等消失
+    TracePrint "战斗中..."
+    Delay 10000
+    TracePrint "战斗中...等待中......."
+    ret = zm.FindPic(201,447,292,543,"win.png","101010",150000,"show",true) '150s内,胜利,点击
+    If ret then
+        ShowMessage "胜利!!!"
+        TracePrint "战斗结束.win.点击继续"
+    Else 
+        TracePrint "战斗...超时..."
+        EndScript
+    End If
+    Delay 500
+    TracePrint "获得道具,点击"
+    zm.Tap (472,507,811,681) '获得道具先点击一下,
+    zm.Delay 2000 
+    If zm.FindPic(934, 532, 1088, 680, "性能.png", 0.8,"@@判断是否获得卡片") Then 
+        TracePrint "获得卡片"
+        zm.Tap (335,92,788,410,2500)  '点击空白处
+        TracePrint "随便一点"
+        if zm.FindColor (149,90,181,116,"29AAFF",0.95) then '是否新卡??
+            TracePrint "new!!!"
+            zm.Tap 790, 500  '点击锁定
+        Else 
+            TracePrint "不是新卡"
+            zm.Tap (335,92,788,410,500)  
+            TracePrint "点击空白处, 确认卡片"
+        End If
+    Else 
+        TracePrint "没有获得 卡片"
+        zm.Tap 30, 30,200
+    End If
+    ShowMessage "经验结算"
+    zm.Tap 30, 30
+    TracePrint "获得经验,确认完毕"
+    zm.Tap (1025,581,1197,635,2500) '获得经验,确认完毕.
+End Function
+//zm.Delay 1000, 2500
+ShowMessage "次数="&次数
+TracePrint "~~~~~~~~~战斗次数:"&次数
+If 次数 > 0 Then 
+   
+    ShowMessage "返回maps"
+     Goto map2_3
+Else 
+    Delay 2000
+    ShowMessage "打完boss 返回map"
+    Goto map
+End If
+'================================================================
+Function info(参数1) '屏显消息, 改了显示位置.
+    'TracePrint "使用了 {函数:info}"
+    ShowMessage 参数1,1000,dx,dy
+    TracePrint "{info}:"&参数1
+    Delay 1000
+End Function
+Function gomap() '
+    TracePrint "使用了 [函数:gomap]"
+    Select Case 章节
+    Case "1-1" 
+        TracePrint "选择了第1-1章"
+    case "1-2"  
+        TracePrint "在map." 
+    case"1-3"  
+        TracePrint "在 ."  
+        call info(章节)
+    case"1-4"  
+        TracePrint " " 
+    case"2-1"  
+        TracePrint " " 
+    case"2-2"  
+        TracePrint " " 
+    case"2-3"  
+        TracePrint "进入章节:2-3" 
+        zm.tap 258,245,323,293
+    case"2-4"  
+        TracePrint " "                
+    Case Else
+        TracePrint " "
+        EndScript
+    End Select
+    TracePrint "结束 [函数:gomap]"
+End Function
+Function 舰队选择()
+    TracePrint "使用了 {函数:舰队选择}"
+    TracePrint "舰队选择"
+    Delay 1500
+    If zm.FindColor (256,549,381,585,"188AF7",0.8,"show") Then '1
+        ShowMessage "第1舰队.已选"
+        TracePrint "第1舰队.已选"
+        '判断有没有两支队伍
+        '找2队
+        zm.Delay (500,1000)    
+    End If 
+    If zm.FindColor (395,545,527,582,"188AF7",0.8,"show") Then '2
+        TracePrint "第2舰队.已选"
+        ShowMessage "第2舰队.已选"
+        '取消选择
+        zm.Tap (395,545,527,582)
+        TracePrint "手动取消2"
+        zm.Delay (500,1000)  
+    Else 
+        TracePrint "第2舰队.取消"
+        ShowMessage "第2舰队.取消", 1000, 560,600
+        Delay 500
+    End If '2
+    If zm.FindColor (542,543,672,582,"188AF7",0.8,"show") Then '3
+        TracePrint "第3舰队.已选"
+        ShowMessage "第3舰队.已选"
+        '取消选择
+        zm.Tap (542,543,672,582)
+        TracePrint "手动取消3"
+    Else 
+        TracePrint "第3舰队.取消"
+        ShowMessage "第3舰队.取消", 1000, 560,600
+        Delay 500
+    End If '3
+    If zm.FindColor (683,549,815,582,"188AF7",0.8) Then '4
+        TracePrint "第4舰队.已选"
+        ShowMessage "第4舰队.已选"
+        '取消选择
+        zm.Tap (683,549,815,582)
+        TracePrint "手动取消4"
+    Else 
+        TracePrint "第4舰队.取消"
+        ShowMessage "第4舰队.取消", 1000, 560,600 
+    End If 	'4
+    TracePrint "结束 {函数:舰队选择}"
+End Function
+Function slv(x1,y1,x2,y2) '找到LV,并点击.
+    TracePrint "开始 {函数:slv}"
+    If 次数 >= 3 Then 
+        slv = boss()
+    Else 
+        lv = zm.FindStr(x1,y1,x2,y2,"lv1|lv2|lv3|lv4|lv5","A5E7F7-202020|84DBFF-202020|63BEDE-202020|52BAEF-202020|42CFEF-202020",500,0.7,"show")
+        If lv Then 
+            TracePrint lv[2],lv[3],lv[4]
+            Delay 100
+            zm.Tap lv[2], lv[3]
+            次数 =次数+1
+            TracePrint "结束 {函数:slv}"
+            Exit Function
+        Else 
+            TracePrint "没找到,结束 {函数:slv}"
+            
+            Exit Function
+        End If
+    End If
+End Function
+Function boss()
+    If zm.FindColor("524DFF", 1, 0.99, true,"shoe") Then 
+        TracePrint "找到boss位置!!!果断推倒!!"
+        '- 检查 有没有被拦住 
+        次数 = 0
+        TracePrint "重置次数=0"
+        '- 补充弹药
+    Else 
+        TracePrint "没有找到boss???"
+    End If
+End Function
+Function wt() '
+    TracePrint " {函数:wt}"
+    ret = zm.FindPic("紧急委托.png|切换.png|每日.png",5000, 0.8,"show")
+    If ret Then 
+        Select Case ret[4]
+        Case "紧急委托"
+            TracePrint "点击{关闭}信息" 
+            zm.tap 926, 185
+        Case "切换"
+            TracePrint "无紧急委托,现在在章节map_s."
+        Case "每日"
+            TracePrint "无紧急委托,现在在 map."
+        End Select
+        ' Else 
+        ' TracePrint "请检查."
+        ' EndScript
+    End If
+    //    TracePrint "2000ms"
+    //    zm.delay 2000, 3000
+    TracePrint " 结束 {函数:wt}"
+End Function
+Sub tt '计时用
+    TracePrint "tt 计时....开始!!"
+    i= 0
+    Do 
+        i = i + 1
+        Delay 1000
+        TracePrint "tt计时:累计" & i & "秒"
+        ShowMessage ("tt计时:累计" & i & "秒",1000, 200,2) 
+    Loop
+    TracePrint  "tt计时....结束"	
+End Sub
+//Rem zj
+Function 整理船坞
+    TracePrint "{函数: 整理船坞}"
+    dt=zm.Delay (200,500)
+    zm.tap 394, 462, 588, 527, 2000 ' 点击{整理}按钮   
+    zm.tap 1097, 17, 1242, 53, 2000 '筛选
+    zm.tap 277, 73, 420, 107, 300 '排序
+    zm.tap  286,236,418,274, 300 '索引
+    zm.tap 287,399,411,441, 300 '阵营
+    zm.tap 295,564,414,598, 300 '稀有度
+    zm.tap 685,645,845,687, 1000 '确定
+    If zm.FindColor(930, 28, 930, 28, "FFFFFF") Then '检查白色
+        TracePrint "升序,无需修改"
+    Else 
+        TracePrint "改为 升序"
+        zm.Tap 928,21,1054,46,500
+    End If
+    zm.SetTap {"minx":-120, "maxx":1, "miny":-120, "maxy":5,"t":dt,"showlog":"显示"} '设置 点击偏移
+    For i = 0 To 6
+        If zm.FindColor(183+170*i, 256, 183+170*i,256, "E7E7E7|E7CF9C",0.96,"show",true) Then '检查 1-7 卡片色
+            zm.Delay (200,500)
+        End If 
+    Next
+    For i = 0 To 2
+        If zm.FindColor(183+170*i, 487, 183+170*i,487, "E7E7E7|E7CF9C",0.96,"show",true) Then '检查 8-10 卡片色
+            zm.Delay (200,500)
+        End If 
+    Next
+    zm.SetTap {"minx":-10, "maxx":1, "miny":-5, "maxy":5, "showlog":"显示"} '设置 点击偏移
+    zm.tap 1034, 652, 1196, 703, 1000
+    zm.Tap 1000, 630, dt
+    zm.Tap 1034, 640, dt
+    zm.Tap 1034, 603, dt
+    zm.Tap 767, 503, dt
+    zm.Tap 787, 513, dt
+    zm.Tap 50, 33, 1000 '返回
+    TracePrint "结束{函数: 整理船坞},, 返回"
+End Function
