@@ -10,7 +10,7 @@ Dim ret '找图
 Dim 次数=0 '记录刷小怪的次数
 Dim dt
 'zm.SetTap {"minx":-10, "maxx":15, "miny":-5, "maxy":20, "t":2000}
-zm.SetTap {"minx":-25, "maxx":1, "miny":-25, "maxy":2}
+zm.SetTap {"minx":-30, "maxx":1, "miny":-35, "maxy":2,"showlog":"显示"}
 '设置固定坐标x浮动范围[-10,15], 固定坐标y浮动范围[-5,20], 点击后默认延时2000毫秒
 '========判断目前所在状态============================================
 ret = zm.FindPic("主页.png|大地图.png|切换.png|战斗中.png", "202020", 2500, 0.75, "show")
@@ -114,7 +114,7 @@ Else
 End If 	'4
 Delay 1000
 '-
-Tap 960, 560
+zm.Tap 960, 560
 TracePrint "立即前往 "
 Goto 章节3_4
 '-
@@ -151,7 +151,7 @@ If 次数 >= 3 Then
     Goto Boss
 Else 
     TracePrint "扫描第4行 "
-    FindColor 164,537,1125,571,"42CFEF",2,0.85,intX,intY '第4行
+    FindColor 164,537,1125,571,"42CFEF",2,0.9,intX,intY '第4行
     If intX > -1 And intY > -1 Then
         次数 = 次数 + 1
         TracePrint "这是第"& 次数 &"次"
@@ -169,7 +169,7 @@ If 次数 >= 3 Then
     Goto Boss
 Else 
     TracePrint "扫描第3行 "
-    FindColor 236,434,1136,460,"42CFEF",2,0.85,intX,intY '第3行
+    FindColor 236,434,1136,460,"42CFEF",2,0.9,intX,intY '第3行
     If intX > -1 And intY > -1 Then
         次数 = 次数 + 1
         TracePrint "这是第"& 次数 &"次"
@@ -188,7 +188,7 @@ If 次数 >= 3 Then
     Goto Boss
 Else 
     TracePrint "扫描第2行 "
-    FindColor 239,325,807,370,"42CFEF",2,0.85,intX,intY '第2行
+    FindColor 239,325,807,370,"42CFEF",2,0.9,intX,intY '第2行
     If intX > -1 And intY > -1 Then
         次数 = 次数 + 1
         TracePrint "这是第"& 次数 &"次"
@@ -207,7 +207,7 @@ If 次数 >= 3 Then
     Goto Boss
 Else 
     TracePrint "扫描第1行 "
-    FindColor 503,243,741,282,"42CFEF",2,0.85,intX,intY '第 1
+    FindColor 503,243,741,282,"42CFEF",2,0.9,intX,intY '第 1
     If intX > -1 And intY > -1 Then
         次数 = 次数 + 1
         TracePrint "这是第"& 次数 &"次"
@@ -252,7 +252,7 @@ zm.Tap intx, inty ' 移动---
 'TracePrint "开始移动........."
 zm.Delay 50 '点击后会闪一下?
 '检查 消失
-
+Rem 再移动
 ret=zm.FindPic (968,592,1187,678,"出击.png", "151515",0.8,"show")
 If ret Then 
     TracePrint "在出击." 
@@ -263,18 +263,24 @@ Else
         TracePrint "遇到伏击" 
         Goto 遇到伏击
     Else 
-        TracePrint "还在章节小地图.再移动." 
-        zm.Delay 1500
+        ret = zm.FindPic(820,627,1053,706,"切换.png", "151515", 1000, 0.7, "show")
+        If ret Then 
+            TracePrint "还在章节小地图.再移动." 
+            zm.Delay 100
+            Goto 移动中
+        Else 
+            goto 再移动
+   
         
         
-        Goto 移动中
+            Goto 移动中
         
-    End If      
+        End If      
             
 
+    End If
+
 End If
-
-
 EndScript
 
 '=========
@@ -317,6 +323,7 @@ EndScript
 Rem 出击
 '检查自律on
 If zm.FindColor(121, 79, 190, 103, "4AF7AD-050505", "下右", 1.0, "show") Then 
+    TracePrint "自律-打开"
 Else 
     '调成自律模式"
     TracePrint "自律-关"
@@ -328,7 +335,7 @@ Else
 End If
 Delay 500
 TracePrint "点击出击"
-zm.Tap 939,594,1185,674, "show", "@出击"
+zm.Tap 945,603,1178,664, "show", "@出击"
 ret = zm.FindPic("整理船坞.png","151515",1000, 0.8)
 If ret Then
     TracePrint "找到图像" & ret["id"], "x=" & ret["x"], "y=" & ret["y"], "图片名=" & ret["name"]
@@ -352,7 +359,7 @@ If zm.FindPic("出击.png", 0.8,3000) Then  '检查规避成功否?"
 Else 
     TracePrint "规避成功."
     Delay 200
-    Tap intx, inty
+    zm.Tap intx, inty
     TracePrint "继续原来的目标" 
     Delay 500
     Goto 移动中 
@@ -427,8 +434,9 @@ Else
 End If
 ShowMessage "经验结算"
 zm.Delay (2000,3000)
-zm.Tap (1025,581,1197,635,2500) '获得经验,确认完毕.
+zm.Tap (1025,581,1197,635,500) '加快显示
 TracePrint "获得经验,确认完毕"
+zm.Tap (1025,581,1197,635,100) '获得经验,确认完毕.
 //zm.Delay 1000, 2500
 //TracePrint "次数="&次数
 //ShowMessage "次数="&次数
