@@ -1,0 +1,303 @@
+Import "zm.luae" //导入插件,只需执行一次
+//zm.Init  //初始化插件,只需执行一次
+//--------------------------------------
+//--定义变量
+Dim ret
+Dim intx,inty
+Dim dt '延时
+Dim i=0
+Dim 坐标(10,2) '二维数组
+Dim arr()
+Dim 是否退役,退役颜色 
+/////////////////////////////////
+zm.SetFindMultiColor {"sim":0.95, "showlog":"显示"} '多点找色-默认参数
+zm.SetTap {"minx":-30, "maxx":2, "miny":-30, "maxy":3, "t":100,"mintouch":10, "maxtouch":30, "showlog":"显示"}
+//////////////// 读取设置 //////////////
+是否退役 = ReadUIConfig("退役否")
+If 是否退役 Then 
+    Select Case ReadUIConfig("退役的颜色")
+    Case 0
+        退役颜色 = "E7E7E7"	
+        TracePrint "船坞满了时,退役 白色"
+    Case 1
+        退役颜色 = "E7CF9C"    
+        TracePrint "船坞满了时,退役 蓝色"
+    Case 2
+        退役颜色 = "E7E7E7|E7CF9C"
+        TracePrint "船坞满了时,退役 白+蓝 "
+    Case Else
+        //否则
+    End Select
+Else 
+    TracePrint    "不退役"
+End If
+//////////////////////////
+//Dim 首页(),章节(),选择舰队,战斗中
+//首页 = array(808,362,"F7DF21","-7|23|F7A210,-36|61|523408,201|-3|52EFFF,188|23|10AEEF,174|64|00387B")
+//章节 = array (743,679,"EFC7A5","46|-40|FFFFFF,177|-59|9CB694,231|-64|B59694,382|-45|F7F3F7,400|-36|94A6FF" )
+dim p_首页 = "812|362|F7DF18,799|379|F7A610,777|425|523408,1011|361|42EBFF,1007|391|10A6E7,980|424|00387B"
+dim p_章节 = "740|676|EFC7A5,764|680|8C6952,942|617|949E7B,972|617|B59694,1144|627|DEEFFF,1173|639|2120FF"
+//dim 选择舰队 = ""
+Dim p_map= "1007|664|424142,1227|683|103C6B,1107|648|1079DE,786|682|101063,775|667|080CCE" '底下3按钮图案
+dim p_战斗中 = "1251|64|E7E3E7,1228|66|DEDFE7,1240|52|313431,1222|48|313431,1228|26|DEDFE7,1209|45|DEDFE7"
+dim p_战斗结束 = "30|344|0869AD,104|338|0865A5,169|343|0865A5,1134|349|0865A5,1206|352|0865A5" '黄斜线的颜色
+dim p_战斗胜利 = "209|483|393C39,264|487|21C339,254|494|FFFFFF,250|477|39D352" '第一个绿勾和周围颜色
+dim p_结算完毕 = "857|600|DEDFDE,909|608|424142,1059|611|FFFFFF,1152|609|393C39" 
+Dim p_获得舰娘= "58|634|CECBCE,71|619|E7D342,1019|592|393839,55|442|CECBE7,1026|567|EFEFEF"
+Dim p_新舰娘 = "139|95|7BBEFF,168|88|7BD3FF,200|75|73EBFF,262|56|7BCFFF,282|51|7BC3FF"
+dim p_出击编队 = "1166|657|D6CF94,1035|612|B5617B,944|614|5A75EF,1123|598|F7F3D6,1143|644|5AAEF7" '出击2
+//
+Dim 范围="117, 52, 1247, 632"
+//dim 小型="10BADE","5|0|10BADE,10|0|10BADE,15|0|10AACE"
+//dim 中型=117, 52, 1247, 632, "10BADE","5|0|10BADE,10|0|10BADE,15|0|10AACE", 0, 0.95
+//dim 大型=117, 52, 1247, 632,"", 0, 0.95
+//Dim boss=117, 52, 1247, 632,"524DFF","0|-2|524DFF,-3|-1|524DFF,11|-4|292439,14|-7|292439", 0, 0.95
+//Dim 问号=117, 52, 1247, 632,"", 0, 0.95
+//Dim 弹药=117, 52, 1247, 632,"", 0, 0.95
+Dim x0,y0
+x0 = 117
+y0= 52
+////////////////
+//////
+Dim 界面判断()
+//
+//Call 
+Thread.Start 检查黄色按钮
+//
+Rem 主
+界面判断 = Array(p_首页, p_章节,p_战斗中,p_map,p_出击编队)  '可自由添加 界面
+Do
+    i=0
+    For Each 多点颜色 In 界面判断
+        // TracePrint 多点颜色
+        If CmpColorEx(多点颜色, 0.9) = 1 Then 
+            TracePrint "界面判断.已识别"
+            TracePrint "///////////即 界面判断("&i&")"
+            //        Goto 目标
+            Exit For
+        Else 
+            TracePrint "///////////界面判断("&i&") 没找到!"
+            If i < UBOUND(界面判断) Then 
+                i = i + 1
+            Else 
+                i=-1
+            End If
+        End If
+        Delay 100
+    Next
+    //
+    If i <> -1 Then 
+        Exit Do
+    End If
+    // 第?遍
+    TracePrint  "第?遍"
+    Delay 500
+Loop 
+//Rem 目标
+TracePrint "-------------------"
+TracePrint i
+Select Case i
+Case 0
+    TracePrint "在首页"
+Case 1
+    TracePrint "在章节"   
+Case 2
+    TracePrint "p_战斗中"
+    战斗
+Case 3
+    TracePrint "在map "
+    索敌_boss 
+    Delay 1000
+    索敌_小型 
+    Delay 1000
+    索敌_中型 
+    Delay 1000
+    索敌_大型
+Case 4
+    TracePrint "在p_出击编队 "
+    出击编队
+Case 5
+    TracePrint "在p_战斗中 "
+    战斗
+Case 6
+    TracePrint "在 "
+    ///////////  
+Case Else
+    TracePrint "什么都没有找到!"
+End Select
+Delay 1000
+Goto 主
+////////////////
+//
+//////////////功能函数////////////
+Function 战斗
+    ShowMessage "战斗ing....",1000,1000,700
+    Do
+        Dim 暂停按钮= CmpColorEx(p_战斗中,0.9)
+        TracePrint  "暂停按钮=",暂停按钮
+        Delay 1000
+    loop While 暂停按钮=1 '等待消失
+    Delay 1000
+    If CmpColorEx(p_战斗结束, 0.9) = 1 Then 
+        TracePrint  "战斗结束,判断win?"
+        Delay 1000 
+        zm.Tap 340,400,1000 '结束战斗
+        zm.tap 635,647,1000  '获得道具
+        //获得卡片?
+        Do 
+            If CmpColorEx(p_结算完毕, 0.9) = 1 Then '确认按钮
+                zm.Tap 1193,634,2000
+            Elseif  CmpColorEx(p_获得舰娘,0.9)= 1 then
+                TracePrint "获得卡片"
+                If CmpColorEx(p_新舰娘 ,0.9) = 1 Then
+                    TracePrint "获得 新卡"
+                    dim 日期= DateTime.Format("%Y-%m-%d %H.%M.%S")
+                    SnapShot "/storage/emulated/0/$MuMu共享文件夹/blhx/新卡"&日期&".png"
+                Else
+                    TracePrint "不是新卡"
+                End If
+                zm.tap 1019,80,2000 '点空白处
+            End If
+            Delay 500 
+        loop Until CmpColorEx(p_战斗结束, 0.9) = 0
+    End If
+End Function
+//
+//
+Function 出击编队
+    Delay 200
+    dim 自律战斗 = CmpColorEx("173|89|4AF7AD,183|86|4AF7AD,183|93|4AF7AD", 0.95) 'on/off的颜色
+    If 自律战斗 = 1 Then 
+        TracePrint "自律  ON"
+    Else 
+        Tap 179, 90
+        TracePrint "自律OFF, 修改为ON"
+        Delay 1000
+    End If
+    zm.Tap 1159,669 ,500  '点击[出击]
+    If CmpColorEx("571|516|10AEFF,579|472|003894,419|478|4ADBFF,410|515|10AEFF,546|491|39CBFF", 0.95) = 1 Then 
+        //船坞满了? 退役?
+        If 是否退役 Then 
+            zm.Tap 571,518,500
+            整理卡片 
+            zm.Tap 1159,669 ,500  '再次点击[出击]
+            Delay 4000 
+            战斗 
+        Else //不退役
+            TracePrint "船坞满了,不整理, 结束脚本!"
+            EndScript
+        End If
+    Else  '没有满, 进入战斗
+        Delay 4000 
+        战斗 
+    End If
+End Function
+//
+Function 整理卡片
+    TracePrint "//////////////f(整理卡片)"
+    'zm.tap 394, 462, 588, 527, 2000  
+    Delay 500
+    zm.tap 1242, 53, 2000 '打开{筛选界面}
+    zm.tap 370,100, 300 '[排序]
+    zm.tap 370,270, 300 '[索引]
+    zm.tap 370,430, 300 '[阵营]
+    zm.tap 370,590, 300 '[稀有度]
+    zm.tap 845,680, 1000 '点[确定]. 关闭{筛选界面}
+    Rem 退役
+    If CmpColor(930, 28, "FFFFFF", 0.95) > -1 Then '检查[排序按钮]颜色.白色?
+        TracePrint "//////////当前排序: 升序"
+    Else 
+        TracePrint "//////////修改排序为: 升序"
+        zm.Tap 1024, 56, 800        
+    End If   
+    For i = 0 To 6
+        If CmpColor(183+170*i, 256,  退役颜色,0.95) > -1 Then '检查 1-7 卡片色
+            dt = zm.Delay(100, 500)
+            zm.tap 183 + 170 * i, 256, dt
+        Else 
+            ShowMessage "位置"&i+1&"不符合"
+        End If 
+    Next    
+    For i = 0 To 2  
+        If CmpColor(183+170*i, 487,退役颜色,0.95) > -1 Then '检查 8-10 卡片色
+            dt = zm.Delay(100, 500)
+            zm.tap 183 + 170 * i, 487, dt
+        Else 
+            ShowMessage "位置"&i+8&"不符合"
+        End If 
+    Next
+    zm.tap 1200,700, 1000 '确定
+    zm.Tap 1100, 650, 500 '确定
+    zm.Tap 1034, 640, 500   '获得道具
+    zm.Tap 1034, 620, 500 '装备 .确定
+    zm.Tap 850, 520, 500  '拆解
+    zm.Tap 787, 513, 500 '获得道具
+    /*  检查第一点颜色,继续循环?
+    If CmpColor(183 + 170, 256, 退役颜色, 0.95) > -1 Then 
+  	Goto 退役
+    End If
+    */
+    zm.Tap 50, 40, 1000 '返回
+    TracePrint "返回"
+End Function
+//
+Function 选择舰队
+End Function
+//
+Function 索敌
+End Function
+//
+Function 索敌_小型
+    ShowMessage "索敌_小型"
+    FindMultiColor 117, 52, 1247, 632, "10BADE","5|0|10BADE,10|0|10BADE,15|0|10AACE", 0, 0.95, intx, inty
+    If intx > -1 Then 
+        TracePrint "找到小型",intx&","&inty
+        移动
+    End If
+End Function
+Function 索敌_中型
+    ShowMessage "索敌_中型"
+    FindMultiColor 117, 52, 1247, 632, "00A6EF","5|0|00A6EF,10|0|00A6EF,15|0|00A6EF", 0, 0.95, intx, inty
+    If intx > -1 Then 
+        TracePrint "找到中型",intx&","&inty
+        移动
+    End If
+End Function
+Function 索敌_大型
+    ShowMessage "索敌_大型"
+    FindMultiColor 117, 52, 1247, 632, "0034BD","5|0|0034BD,10|0|0034BD,15|0|0034BD", 0, 0.95, intx, inty
+    If intx > -1 Then 
+        TracePrint "找到大型",intx&","&inty
+        移动
+    End If
+End Function
+//
+Function 索敌_boss
+    ShowMessage "索敌_boss"
+    FindMultiColor 117, 52, 1247, 632, "524DFF","0|-2|524DFF,-3|-1|524DFF,11|-4|292439,14|-7|292439", 0, 0.95, intx, inty
+    If intx > -1 Then 
+        TracePrint "找到boss!!",intx&","&inty
+        移动
+    End If
+End Function
+//
+Function 移动
+    Randomize
+    dim 偏移= Int((50 - 25 + 1) * Rnd() + 25)
+    Tap intx + 偏移, inty + 偏移
+    // 出击编队
+End Function
+//
+Sub 检查黄色按钮
+    Do 
+        FindMultiColor 0,0,0,0,"18B2FF","2|-46|003894,-1|-26|39CBFF,-4|-15|18AEFF,10|-15|108ABD,14|-21|181418",0,0.9,intX,intY
+        If intX > -1 And intY > -1 Then 
+            TracePrint "\\\\\\\\\\\\\\\\\\\\\\发现黄色按钮..点击"
+            zm.Tap intX,inty,1000
+        End If
+        Delay 1000
+    loop
+End Sub
+//
+Function oooooo
+End Function
