@@ -1,5 +1,5 @@
 Import "zm.luae" //导入插件,只需执行一次
-//zm.Init  //初始化插件,只需执行一次
+zm.Init '初始化插件,只需执行一次
 //--------------------------------------
 //--定义变量
 Dim ret
@@ -14,6 +14,7 @@ zm.SetFindMultiColor {"sim":0.95, "showlog":"显示"} '多点找色-默认参数
 zm.SetTap {"minx":-30, "maxx":2, "miny":-30, "maxy":3, "t":100,"mintouch":10, "maxtouch":30, "showlog":"显示"}
 //////////////// 读取设置 //////////////
 是否退役 = ReadUIConfig("退役否")
+
 If 是否退役 Then 
     Select Case ReadUIConfig("退役的颜色")
     Case 0
@@ -58,7 +59,6 @@ Dim x0,y0
 x0 = 117
 y0= 52
 ////////////////
-//////
 Dim 界面判断()
 //
 //Call 
@@ -271,7 +271,6 @@ Function 索敌_大型
         移动
     End If
 End Function
-//
 Function 索敌_boss
     ShowMessage "索敌_boss"
     FindMultiColor 117, 52, 1247, 632, "524DFF","0|-2|524DFF,-3|-1|524DFF,11|-4|292439,14|-7|292439", 0, 0.95, intx, inty
@@ -295,7 +294,7 @@ Sub 检查黄色按钮
             TracePrint "\\\\\\\\\\\\\\\\\\\\\\发现黄色按钮..点击"
             zm.Tap intX,inty,1000
         End If
-        Delay 1000
+        Delay 1000 
     loop
 End Sub
 //
