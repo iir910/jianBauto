@@ -9,7 +9,7 @@ Dim i=0
 Dim 坐标(10,2) '二维数组
 Dim arr()
 Dim 是否退役,退役颜色 
-Dim 模式,章节设置,获得新船时截图
+Dim 模式,章节设定值,获得新船时截图,完成选章节
 /////////////////////////////////
 zm.SetFindMultiColor {"sim":0.95, "showlog":"显示"} '多点找色-默认参数
 zm.SetTap {"minx":-30, "maxx":2, "miny":-30, "maxy":3, "t":100,"mintouch":10, "maxtouch":30, "showlog":"显示"}
@@ -47,12 +47,13 @@ If ReadUIConfig("刷好感") Then
 End If
 TracePrint "////////////////////////模式="&模式
 //
-章节设置 = ReadUIConfig("章") & "-" & ReadUIConfig("节")+1
-TracePrint "////////////////////////章节设置="&章节设置
+章节设定值 = ReadUIConfig("章")+1 & "-" & ReadUIConfig("节")+1
+TracePrint "////////////////////////章节设定值="&章节设定值
 //
 获得新船时截图 = ReadUIConfig("获得新船时截图")
-
 TracePrint "//////////////////////获得新船时截图 =",获得新船时截图
+//
+TracePrint "每次都重置章节 =",ReadUIConfig("每次都重置章节")
 //////////////////////////
 //Dim 首页(),章节(),选择舰队,战斗中
 dim p_首页 = "812|362|F7DF18,799|379|F7A610,777|425|523408,1011|361|42EBFF,1007|391|10A6E7,980|424|00387B"
@@ -66,6 +67,7 @@ dim p_结算完毕 = "857|600|DEDFDE,909|608|424142,1059|611|FFFFFF,1152|609|393C39"
 Dim p_获得舰娘= "58|634|CECBCE,71|619|E7D342,1019|592|393839,55|442|CECBE7,1026|567|EFEFEF"
 Dim p_新舰娘 = "139|95|7BBEFF,168|88|7BD3FF,200|75|73EBFF,262|56|7BCFFF,282|51|7BC3FF"
 dim p_出击编队 = "1166|657|D6CF94,1035|612|B5617B,944|614|5A75EF,1123|598|F7F3D6,1143|644|5AAEF7" '出击2
+Dim p_遇到伏击="1008|405|CECFCE,718|403|10AEFF,399|460|18714A,161|391|1069A5,1128|392|1069A5"
 //
 Dim 范围="117, 52, 1247, 632"
 //Dim 问号=117, 52, 1247, 632,"", 0, 0.95
@@ -77,17 +79,16 @@ y0= 52
 Dim 界面判断()
 //
 //Call 
-Thread.Start 检查黄色按钮
+//TracePrint "启动线程: 检查黄色按钮"
+//Thread.Start 检查黄色按钮
 //
 Rem 主
-界面判断 = Array(p_首页, p_章节,p_战斗中,p_map,p_出击编队,p_战斗结束)  '可自由添加 界面
-
+界面判断 = Array(p_首页, p_章节,p_战斗中,p_map,p_出击编队,p_战斗结束,p_遇到伏击)  '可自由添加 界面
 Do
     i=0
     For Each 多点颜色 In 界面判断
         // TracePrint 多点颜色
         If CmpColorEx(多点颜色, 0.93) = 1 Then 
-            TracePrint "
             TracePrint "///////////界面判断.已识别 = 界面判断("&i&")"
             //        Goto 目标
             Exit For
@@ -99,7 +100,7 @@ Do
                 i=-1
             End If
         End If
-        Delay 200
+        Delay 500
     Next
     //
     If i <> -1 Then 
@@ -117,19 +118,22 @@ Case 0
     首页
 Case 1
     TracePrint "在章节"  
-    选章节
+    选章节 
+    进入map
 Case 2
     TracePrint "p_战斗中"
     //战斗
 Case 3
     TracePrint "在map "
+    KeepCapture
     索敌_boss 
     Delay 1000
     索敌_小型 
     Delay 1000
     索敌_中型 
     Delay 1000
-    索敌_大型
+    索敌_大型 
+    ReleaseCapture
 Case 4
     TracePrint "在p_出击编队 "
     出击编队
@@ -137,18 +141,123 @@ Case 5
     TracePrint "p_战斗结束 "
     战斗结束
 Case 6
-    TracePrint "在 "
+    TracePrint "p_遇到伏击 "
+    遇到伏击
     ///////////  
 Case Else
     TracePrint "什么都没有找到!"
 End Select  
 Delay 1000
-
-
 Goto 主
 ////////////////
 //
 //////////////功能函数////////////
+Function 首页
+    //  TracePrint "在首页"
+    Select Case 模式
+    Case 1
+        zm.tap 1176,426,500 '出击
+        选章节 
+        //        Delay 1500
+        //       TracePrint "888"
+        进入map
+    Case 2
+    Case 3
+    Case 4
+    End Select
+End Function
+//
+Function 选章节
+    If ReadUIConfig("每次都重置章节")=false and 完成选章节=1  Then 
+        TracePrint "不用重置章节"
+        Exit Function
+    End If
+    ShowMessage "开始重置章节"
+    If 模式 = 1 Then 
+        Do
+            If CmpColorEx("74|370|CECFCE,62|355|E7E7E7,49|358|8C8E8C,70|339|B5B2B5",0.9) = 1 Then
+                zm.tap 74,370,800 '点击 上
+            Else
+                TracePrint "到达第一章"
+                ShowMessage "到达第一章"
+                Delay 1000
+                Exit Do
+            End If
+        Loop
+        For ReadUIConfig("章")
+            zm.tap 1235,385,1100 '点击 下
+        Next
+    End If
+    ShowMessage "完成选章节"
+    Delay 1000
+    完成选章节 = 1
+    TracePrint "完成选章节"
+End Function
+//
+Function 进入map
+    Select Case 章节设定值
+    Case "1-1"
+    Case "1-2"
+    Case "1-3"
+    Case "1-4"
+    Case "2-1"
+    Case "2-2"
+    Case "2-3"
+    Case "2-4"
+    Case "3-1"
+    Case "3-2"
+    Case "3-3"
+    Case "3-4"
+        TracePrint "进入3-4"
+        zm.Tap 635, 389, 1000 '关卡信息
+        zm.tap 1015,502 '立即前往1
+    Case "4-1"
+    Case "4-2"
+    Case "4-3"
+    Case "4-4"
+    Case "5-1"
+    Case "5-2"
+    Case "5-3"
+    Case "5-4"
+    Case "6-1"
+    Case "6-2"
+    Case "6-3"
+    Case "6-4"
+    Case "7-1"
+    Case "7-2"
+    Case "7-3"
+    Case "7-4"
+    Case "8-1"
+    Case "8-2"
+    Case "8-3"
+    Case "8-4"
+    Case "9-1"
+    Case "9-2"
+    Case "9-3"
+    Case "9-4"
+    Case "10-1"
+    Case "10-2"
+    Case "10-3"
+    Case "10-4"
+    Case "11-1"
+    Case "11-2"
+    Case "11-3"
+    Case "11-4"
+    Case "12-1"
+    Case "12-2"
+    Case "12-3"
+    Case "12-4"
+    End Select
+    Delay 1000
+    舰队选择 
+End Function
+Function 舰队选择
+    //"1138|642|10AEFF,1138|160|635142,1141|96|42D7FF,1171|96|ADAAAD,419|85|F7F3EF"
+    //
+    zm.tap  1139,644,1000 '立刻前往2
+    //
+End Function
+//
 //Function 战斗
 //    ShowMessage "战斗ing....",1000,1000,700
 //    Do
@@ -192,6 +301,8 @@ Function 战斗结束
     Delay 1000 
     zm.Tap 340,400,1000 '结束战斗
     zm.tap 635,647,1000  '获得道具
+    //   zm.FindMultiColor()
+    i=0
     //获得卡片?
     Do 
         If CmpColorEx(p_结算完毕, 0.9) = 1 Then '确认按钮
@@ -214,7 +325,8 @@ Function 战斗结束
             zm.tap 1019,80,2000 '点空白处
         End If
         Delay 1000
-    loop Until CmpColorEx(p_战斗结束, 0.9) = 0
+        i=i+1
+    loop Until i=5
 End Function
 //
 Function 出击编队
@@ -338,122 +450,47 @@ Function 移动
     //
 End Function
 //
+Function 遇到伏击
+//
+If ReadUIConfig("伏击", true) Then 
+    TracePrint "规避"
+    zm.tap	1008,404
+Else 
+    TracePrint "迎击"
+    zm.tap 721,405 '迎击	
+End If
+End Function
+//
 Sub 检查黄色按钮
-    Do 
-        FindMultiColor 0,0,0,0,"18B2FF","2|-46|003894,-1|-26|39CBFF,-4|-15|18AEFF,10|-15|108ABD,14|-21|181418",0,0.9,intX,intY
-        If intX > -1 And intY > -1 Then 
-            //特殊情况?
-            If CmpColorEx("1008|405|CECFCE,718|403|10AEFF,399|460|18714A,161|391|1069A5,1128|392|1069A5",0.9) = 1 Then
-                TracePrint "//////////////遇到伏击"
-                //
-                TracePrint "//////////////尝试规避"
-                zm.tap 999, 403, 1000
-                //检查规避成功?
-                //
-            Else 
-                //非特殊情况
-                TracePrint "\\\\\\\\\\\\\\\\\\\\\\发现黄色按钮..点击"
-                zm.Tap intX,inty,1000
-            End If
-        End If
-        Delay 1000 
-    loop
+    //    Do
+    //        KeepCapture 
+    //        Delay 100
+    //        //dim 按钮色=array("10AEFF","6|-45|003894,-171|2|18B6FF,-173|-44|52DBFF,17|13|181818,-117|-49|CEFFFF")
+    //        FindMultiColor 0,0,0,0,"18AEFF","2|-42|003494,-168|-41|4ADFFF,-167|1|18B6FF",0,0.95,intX,intY
+    //        If intX > -1 And intY > -1 Then 
+    //            
+    //            Dim 选舰队="1138|642|10AEFF,1138|160|635142,1141|96|42D7FF,1171|96|ADAAAD,419|85|F7F3EF"
+    //            Dim 满了="576|518|18B6FF,954|191|ADAAAD,436|179|525152,876|514|10AAFF,579|473|00309C,879|473|00309C"
+    //            If CmpColorEx(遇到伏击,0.9) = 1 Then  '属于特殊情况?
+    //                TracePrint "//////////////发现黄色按钮: 遇到伏击"
+    //                //ReadUIConfig("伏击")
+    //                TracePrint "//////////////尝试规避"
+    //                zm.tap 999, 403, 1000
+    //                //检查规避成功?
+    //                //
+    //            ElseIf CmpColorEx(选舰队, 0.9) = 1 Then
+    //                TracePrint "发现黄色按钮: 选舰队图"
+    //            ElseIf CmpColorEx(满了, 0.9) = 1 Then
+    //                TracePrint "发现黄色按钮: 满了"
+    //                Delay 35000
+    //            else  '非特殊情况
+    //                ShowMessage "发现黄色按钮..点击"
+    //                TracePrint "\\\\\\\\\\\\\\\\\\\\\\发现黄色按钮..点击"
+    //                zm.Tap intX,inty,1000
+    //            End If
+    //        End If
+    //        Delay 1000
+    //        ReleaseCapture
+    //    loop
 End Sub
 //
-Function 首页
-    //  TracePrint "在首页"
-    Select Case 模式
-    Case 1
-        zm.tap 1176,426,500 '出击
-        选章节
-    Case 2
-    Case 3
-    Case 4
-    End Select
-End Function
-Function 选章节
-    ShowMessage "重置章节"
-    If 模式 = 1 Then 
-        Do
-            If CmpColorEx("74|370|CECFCE,62|355|E7E7E7,49|358|8C8E8C,70|339|B5B2B5",0.9) = 1 Then
-                zm.tap 74,370,800 '点击 上
-            Else
-                TracePrint "到达第一章"
-                ShowMessage "到达第一章"
-                Delay 1000
-                Exit Do
-            End If
-        Loop
-        i = ReadUIConfig("章")
-        TracePrint i
-        For i
-            zm.tap 1225,378,800 '点击 下
-            章节
-        Next
-    End If
-End Function
-//
-Function 进地图
-End Function
-//
-Function 章节
-    Thread.Stop 检查黄色按钮 '中断
-    Delay 1100
-    Select Case 章节设置
-    Case "1-1"
-    Case "1-2"
-    Case "1-3"
-    Case "1-4"
-    Case "2-1"
-    Case "2-2"
-    Case "2-3"
-    Case "2-4"
-    Case "3-1"
-    Case "3-2"
-    Case "3-3"
-    Case "3-4"
-        zm.Tap 635, 389, 1000 '
-        zm.tap 1015,502 '立即前往
-    Case "4-1"
-    Case "4-2"
-    Case "4-3"
-    Case "4-4"
-    Case "5-1"
-    Case "5-2"
-    Case "5-3"
-    Case "5-4"
-    Case "6-1"
-    Case "6-2"
-    Case "6-3"
-    Case "6-4"
-    Case "7-1"
-    Case "7-2"
-    Case "7-3"
-    Case "7-4"
-    Case "8-1"
-    Case "8-2"
-    Case "8-3"
-    Case "8-4"
-    Case "9-1"
-    Case "9-2"
-    Case "9-3"
-    Case "9-4"
-    Case "10-1"
-    Case "10-2"
-    Case "10-3"
-    Case "10-4"
-    Case "11-1"
-    Case "11-2"
-    Case "11-3"
-    Case "11-4"
-    Case "12-1"
-    Case "12-2"
-    Case "12-3"
-    Case "12-4"
-    End Select
-    Delay 1000
-    舰队选择 
-    Thread.Start 检查黄色按钮 '启动线程
-End Function
-Function 舰队选择
-End Function
