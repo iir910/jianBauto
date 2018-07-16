@@ -11,6 +11,9 @@ Dim 坐标(10,2) '二维数组
 Dim arr()
 Dim 是否退役,退役颜色 
 Dim 模式,章节设定值,获得新船时截图,完成选章节
+Dim 轮数=0
+Dim 战斗合计=0
+dim 战斗次数=0
 /////////////////////////////////
 zm.SetFindMultiColor {"sim":0.95, "showlog":"显示"} '多点找色-默认参数
 zm.SetTap {"minx":-30, "maxx":2, "miny":-30, "maxy":3, "t":100,"mintouch":10, "maxtouch":30, "showlog":"显示"}
@@ -89,7 +92,7 @@ Do
     i=0
     For Each 多点颜色 In 界面判断
         // TracePrint 多点颜色
-        If CmpColorEx(多点颜色, 0.93) = 1 Then 
+        If CmpColorEx(多点颜色, 0.9) = 1 Then 
             TracePrint "///////////界面判断.已识别 = 界面判断("&i&")"
             //        Goto 目标
             Exit For
@@ -123,16 +126,17 @@ Case 1
     进入map
 Case 2
     TracePrint "p_战斗中"
+    ShowMessage "轮数 = "&轮数&"\n战斗次数 = "&战斗次数&"\n战斗合计 = "&战斗合计
     //战斗
 Case 3
     TracePrint "在map "
     KeepCapture
     索敌_boss 
-    Delay 1000
+    Delay 500
     索敌_小型 
-    Delay 1000
+    Delay 500
     索敌_中型 
-    Delay 1000
+    Delay 500
     索敌_大型 
     ReleaseCapture
 Case 4
@@ -257,6 +261,8 @@ Function 舰队选择
     //
     zm.tap  1139,644,1000 '立刻前往2
     //
+    轮数 = 轮数 + 1
+    战斗次数=0
 End Function
 //
 //Function 战斗
@@ -299,6 +305,8 @@ End Function
 //
 Function 战斗结束
     TracePrint  "战斗结束,判断win?"
+    战斗次数 = 战斗次数 + 1
+    战斗合计 = 战斗合计 +1
     Delay 1000 
     zm.Tap 340,400,1000 '结束战斗
     zm.tap 635,647,1000  '获得道具
@@ -460,6 +468,27 @@ Function 遇到伏击
     Else 
         TracePrint "迎击"
         zm.tap 721,405 '迎击	
+    End If
+End Function
+//
+Function 维修
+    If ReadUIConfig("维修") = false Then 
+        exit Function	
+    End If
+    //
+    If CmpColorEx("181|505|94B218,172|482|ADD700,155|499|9CBE10",0.95) = 1 Then
+        TracePrint "使用 紧急维修"
+        zm.Tap 197, 528, 500 '使用
+        zm.Tap 815, 493,5 '确定
+        If CmpColorEx("333|336|0882DE,367|341|0882DE,905|337|0882DE", 0.9) = 1 Then 
+            TracePrint "全员hp满,无法使用"
+            zm.Tap 596, 493, 100
+            zm.Tap 1123,666,1000 '出击2
+        Else 
+            出击编队
+        End If
+    Else
+        TracePrint "没有维修道具"
     End If
 End Function
 //
