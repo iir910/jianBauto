@@ -1,3 +1,4 @@
+//±ÌÀ¶º½Ïß
 Import "zm.luae" //µ¼Èë²å¼þ,Ö»ÐèÖ´ÐÐÒ»´Î
 zm.Init '³õÊ¼»¯²å¼þ,Ö»ÐèÖ´ÐÐÒ»´Î
 //--------------------------------------
@@ -445,21 +446,32 @@ End Function
 //
 Function ÒÆ¶¯
     Randomize
-    dim Æ«ÒÆ= Int((60 - 20 + 1) * Rnd() + 20)
-    Tap intx + Æ«ÒÆ, inty + Æ«ÒÆ
+    dim Æ«ÒÆx= Int((60 - 20 + 1) * Rnd() + 20)
+    dim Æ«ÒÆy= Int((35 - 20 + 1) * Rnd() + 20)
+    Tap intx + Æ«ÒÆx, inty + Æ«ÒÆy
     //
 End Function
 //
 Function Óöµ½·ü»÷
-//
-If ReadUIConfig("·ü»÷", true) Then 
-    TracePrint "¹æ±Ü"
-    zm.tap	1008,404
-Else 
-    TracePrint "Ó­»÷"
-    zm.tap 721,405 'Ó­»÷	
-End If
+    //
+    If ReadUIConfig("·ü»÷", true) Then 
+        TracePrint "¹æ±Ü"
+        zm.tap	1008,404
+    Else 
+        TracePrint "Ó­»÷"
+        zm.tap 721,405 'Ó­»÷	
+    End If
 End Function
+//
+Sub ½ô¼±Î¯ÍÐ
+    do
+        If CmpColorEx("726|517|18B2FF,728|472|003894,926|189|42D7FF,963|188|ADAAAD,309|167|F7F3F7",0.9) = 1 Then
+            TracePrint "½ô¼±Î¯ÍÐ,¹Ø±Õ"
+            zm.tap  726,517,10*1000
+        End If
+        Delay 1000
+    Loop 
+End Sub
 //
 Sub ¼ì²é»ÆÉ«°´Å¥
     //    Do
