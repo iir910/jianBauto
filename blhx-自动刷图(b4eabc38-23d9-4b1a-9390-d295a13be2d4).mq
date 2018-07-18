@@ -137,8 +137,8 @@ Case 1
         进入map
     End If
     If 模式 = 2 Then 
-        zm.Tap 855, 422, 1000  'sp3
-        zm.tap 1015, 502,1000  '关卡信息
+        zm.Tap 855, 422, 1000  '点击 sp3
+        zm.tap 1015, 502,1000  '点击 立刻前往1
         舰队选择  
     End If
 Case 2
@@ -295,8 +295,6 @@ Function 舰队选择
         If 是否退役 Then 
             zm.Tap 571,518,500
             整理卡片 
-            zm.Tap 1159,669 ,500  '再次点击[出击]
-            Delay 4000 
         Else //不退役
             TracePrint "船坞满了,不整理, 结束脚本!"
             EndScript
@@ -305,7 +303,7 @@ Function 舰队选择
         Delay 1000 
     End If
     //"1138|642|10AEFF,1138|160|635142,1141|96|42D7FF,1171|96|ADAAAD,419|85|F7F3EF"
-    //
+    //选队完毕,
     zm.tap  1139,644,1000 '立刻前往2
     //
     轮数 = 轮数 + 1
@@ -420,9 +418,6 @@ Function 整理卡片
     */
     zm.Tap 50, 40, 1000 '返回
     TracePrint "返回"
-End Function
-//
-Function 选择舰队
 End Function
 //
 Function 索敌
