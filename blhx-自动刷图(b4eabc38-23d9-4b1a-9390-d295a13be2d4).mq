@@ -59,10 +59,23 @@ Else
 End If
 //判断模式
 If ReadUIConfig("刷章节") Then 
-    模式=1
+    模式 = 1
+    章节设定值 = ReadUIConfig("章")+1 & "-" & ReadUIConfig("节")+1
+    TracePrint "////////////////////////章节设定值="&章节设定值
+    //
+    TracePrint "每次都重置章节 =",ReadUIConfig("每次都重置章节")
 End If
 If ReadUIConfig("刷活动") Then 
-    模式=2
+    模式 = 2
+    //sp3?
+    //
+    dim sp= ReadUIConfig("sp")
+    TracePrint "sp =",sp
+    Select Case sp
+    Case 1
+    Case 2
+    Case 3
+    End Select
 End If
 If ReadUIConfig("炼金术") Then 
     模式=3
@@ -72,13 +85,9 @@ If ReadUIConfig("刷好感") Then
 End If
 TracePrint "////////////////////////模式="&模式
 //
-章节设定值 = ReadUIConfig("章")+1 & "-" & ReadUIConfig("节")+1
-TracePrint "////////////////////////章节设定值="&章节设定值
 //
 获得新船时截图 = ReadUIConfig("获得新船时截图")
 TracePrint "//////////////////////获得新船时截图 =",获得新船时截图
-//
-TracePrint "每次都重置章节 =",ReadUIConfig("每次都重置章节")
 ///////////////////////////////////////////////////////////////////
 //
 //TracePrint "启动线程: 检查黄色按钮"
@@ -123,8 +132,15 @@ Case 0
     首页
 Case 1
     TracePrint "在章节"  
-    选章节 
-    进入map
+    If 模式 = 1 Then 
+        选章节 
+        进入map
+    End If
+    If 模式 = 2 Then 
+        zm.Tap 855, 422, 1000  'sp3
+        zm.tap 1015, 502,1000  '关卡信息
+        舰队选择  
+    End If
 Case 2
     TracePrint "p_战斗中"
     ShowMessage "轮数 = "&轮数&"\n战斗次数 = "&战斗次数&"\n战斗合计 = "&战斗合计
@@ -150,13 +166,9 @@ Case 5
 Case 6
     TracePrint "p_遇到伏击 "
     遇到伏击
-
 Case 7
     TracePrint "p_获得道具 "
     获得道具
-    
-    
-    
 Case Else
     TracePrint "什么都没有找到!"
 End Select  
@@ -175,9 +187,9 @@ Function 首页
         //       TracePrint "888"
         进入map
     Case 2 '活动
-        zm.tap 714, 185, 1000
-        zm.Tap 855, 422, 1000
-        zm.tap 1015, 502,1000  '
+        zm.tap 714, 185, 1000 '活动
+        zm.Tap 855, 422, 1000  'sp3
+        zm.tap 1015, 502,1000  '关卡信息
         舰队选择  
     Case 3
     Case 4
@@ -278,6 +290,20 @@ Function 进入map
     舰队选择 
 End Function
 Function 舰队选择
+    If CmpColorEx("571|516|10AEFF,579|472|003894,419|478|4ADBFF,410|515|10AEFF,546|491|39CBFF", 0.95) = 1 Then 
+        //船坞满了? 退役?
+        If 是否退役 Then 
+            zm.Tap 571,518,500
+            整理卡片 
+            zm.Tap 1159,669 ,500  '再次点击[出击]
+            Delay 4000 
+        Else //不退役
+            TracePrint "船坞满了,不整理, 结束脚本!"
+            EndScript
+        End If
+    Else  '没有满, 进入战斗
+        Delay 1000 
+    End If
     //"1138|642|10AEFF,1138|160|635142,1141|96|42D7FF,1171|96|ADAAAD,419|85|F7F3EF"
     //
     zm.tap  1139,644,1000 '立刻前往2
@@ -499,7 +525,7 @@ End sub
 Function 问号
     FindMultiColor 0,0,0,0,"F7FF94","32|0|EFEFEF,3|20|F7F3F7,8|0|292829",0,0.9,intX,intY
     If intX > -1 And intY > -1 Then 
-    	TracePrint "////////////////////////////捡问号"
+        TracePrint "////////////////////////////捡问号"
         Tap intX,inty+60
     End If
 End Function
@@ -507,7 +533,7 @@ End Function
 Function 获得道具
     If CmpColorEx("513|141|63AEF7,776|141|63B6F7,775|182|319AF7,658|187|31DBFF,606|194|31CBFF,559|190|31AAF7",0.95) = 1 Then
         TracePrint "获得道具"
-zm.Tap 553,39,1000
+        zm.Tap 553,39,1000
     End If
 End Function
 //
