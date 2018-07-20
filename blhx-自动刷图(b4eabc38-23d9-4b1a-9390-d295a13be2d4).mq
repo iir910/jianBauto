@@ -132,14 +132,26 @@ Case 0
     首页
 Case 1
     TracePrint "在章节"  
+    Dim mm=CmpColorEx("31|99|FFFFFF,39|99|FFFFFF,35|116|FFFFFF,31|113|FFFFFF,65|116|FFFFFF,46|115|FFFFFF",0.9) 
+    If mm= 1 Then
+        TracePrint "在sp活动地图"
+    Else
+        TracePrint "在主线地图"
+    End If
     If 模式 = 1 Then 
+        If mm <> 0 Then 
+            zm.tap 69,42,1000
+        End If
         选章节 
         进入map
     End If
     If 模式 = 2 Then 
+        If mm <> 1 Then 
+            zm.tap 1227,195,1000
+        End If
         zm.Tap 855, 422, 1000  '点击 sp3
         zm.tap 1015, 502,1000  '点击 立刻前往1
-        舰队选择  
+        舰队选择 
     End If
 Case 2
     TracePrint "p_战斗中"
@@ -351,9 +363,13 @@ Function 出击编队
     If 自律战斗 = 1 Then 
         TracePrint "自律  ON"
     Else 
-        Tap 179, 90
-        TracePrint "自律OFF, 修改为ON"
+        Tap 179, 90 
         Delay 1000
+        TracePrint "自律OFF, 修改为ON"
+        If CmpColorEx("726|543|18B6FF,727|496|003894,925|163|42D7FF,958|164|ADAAAD",0.9) = 1 Then
+            TracePrint "关闭信息"
+            zm.Tap 726,543
+        End If
     End If
     zm.Tap 1159,669 ,500  '点击[出击]
     If CmpColorEx("571|516|10AEFF,579|472|003894,419|478|4ADBFF,410|515|10AEFF,546|491|39CBFF", 0.95) = 1 Then 
@@ -388,11 +404,13 @@ Function 整理卡片
     Else 
         TracePrint "//////////修改排序为: 升序"
         zm.Tap 1024, 56, 800        
-    End If   
+    End If
+    Dim k=0
     For i = 0 To 6
         If CmpColor(183+170*i, 256,  退役颜色,0.95) > -1 Then '检查 1-7 卡片色
             dt = zm.Delay(100, 500)
             zm.tap 183 + 170 * i, 256, dt
+            k=k+1
         Else 
             ShowMessage "位置"&i+1&"不符合"
         End If 
@@ -401,10 +419,16 @@ Function 整理卡片
         If CmpColor(183+170*i, 487,退役颜色,0.95) > -1 Then '检查 8-10 卡片色
             dt = zm.Delay(100, 500)
             zm.tap 183 + 170 * i, 487, dt
+            k=k+1
         Else 
             ShowMessage "位置"&i+8&"不符合"
         End If 
     Next
+    TracePrint "合计k =",k
+    If k = 0 Then 
+        TracePrint "没有空位...请检查船坞"	
+        EndScript
+    End If
     zm.tap 1200,700, 1000 '确定
     zm.Tap 1100, 650, 500 '确定
     zm.Tap 1034, 640, 500   '获得道具
