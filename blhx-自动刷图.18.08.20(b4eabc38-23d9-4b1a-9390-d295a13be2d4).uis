@@ -3,7 +3,6 @@ Function mode1()
     UIP.SetAttribute "刷活动", {"选中":false}
     UIP.SetAttribute "炼金术", {"选中":false}
     UIP.SetAttribute "刷好感", {"选中":false}
-    
 End Function
 Function mode2()
     UIP.SetAttribute "刷章节", {"选中":false}
@@ -21,4 +20,9 @@ Function mode4()
     UIP.SetAttribute "炼金术", {"选中":false}
 End Function
 //
-
+Function 心情处理1
+    UIP.SetAttribute "心情中止", {"选中":false}
+End Function
+Function 心情处理2
+    UIP.SetAttribute "心情休息", {"选中":false}
+End Function

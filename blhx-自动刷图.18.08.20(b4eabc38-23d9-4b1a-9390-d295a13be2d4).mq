@@ -7,6 +7,10 @@ Dim ret
 Dim intx,inty
 Dim dt '延时
 Dim i=0
+dim t = 0
+dim h= Int(t/3600)
+dim m= int((t-h*3600)/60)
+dim s= t-h*3600-m*60 
 Dim 坐标(10,2) '二维数组
 Dim arr()
 Dim 是否退役,退役颜色 
@@ -30,8 +34,8 @@ Dim p_遇到伏击="1008|405|CECFCE,718|403|10AEFF,399|460|18714A,161|391|1069A5,112
 Dim p_获得道具="513|141|63AEF7,776|141|63B6F7,775|182|319AF7,658|187|31DBFF,606|194|31CBFF,559|190|31AAF7"
 //
 Dim 范围="117, 52, 1247, 632"
-//Dim 问号=117, 52, 1247, 632,"", 0, 0.95
-//Dim 弹药=117, 52, 1247, 632,"", 0, 0.95
+//Dim 问号=124,173,1240,632,"", 0, 0.95
+//Dim 弹药=124,173,1240,632,"", 0, 0.95
 Dim x0,y0
 x0 = 117
 y0= 52
@@ -85,6 +89,8 @@ If ReadUIConfig("刷好感") Then
 End If
 TracePrint "////////////////////////模式="&模式
 //
+//ReadUIConfig("索敌顺序1")
+TracePrint ReadUIConfig("索敌顺序1")
 //
 获得新船时截图 = ReadUIConfig("获得新船时截图")
 TracePrint "//////////////////////获得新船时截图 =",获得新船时截图
@@ -94,7 +100,8 @@ TracePrint "//////////////////////获得新船时截图 =",获得新船时截图
 //Thread.Start 检查黄色按钮
 Thread.Start 紧急委托
 Thread.Start 跳过剧情
-//
+//Thread.Start 计时
+//////////////////////////////
 Dim 界面判断()
 Rem 主
 界面判断 = Array(p_首页, p_章节,p_战斗中,p_map,p_出击编队,p_战斗结束,p_遇到伏击,p_获得道具)  '可自由添加 界面
@@ -114,7 +121,7 @@ Do
                 i=-1
             End If
         End If
-        Delay 300
+        Delay 200
     Next
     //
     If i <> -1 Then 
@@ -133,6 +140,7 @@ Case 0
 Case 1
     TracePrint "在章节"  
     Dim mm=CmpColorEx("31|99|FFFFFF,39|99|FFFFFF,35|116|FFFFFF,31|113|FFFFFF,65|116|FFFFFF,46|115|FFFFFF",0.9) 
+    '判断 在sp活动地图 or 在主线地图
     If mm= 1 Then
         TracePrint "在sp活动地图"
     Else
@@ -155,20 +163,21 @@ Case 1
     End If
 Case 2
     TracePrint "p_战斗中"
-    ShowMessage "轮数 = "&轮数&"\n战斗次数 = "&战斗次数&"\n战斗合计 = "&战斗合计
+    ShowMessage "轮数 = "&轮数&"\n战斗次数 = "&战斗次数&"\n战斗合计 = "&战斗合计  //&"\n"&"经过时间 ="&h&"时"&m&"分"&s&"秒"   //,1000,260,0
     //战斗
 Case 3
     TracePrint "在map "
-    KeepCapture 
-    问号
-    索敌_boss 
-    Delay 500
-    索敌_小型 
-    Delay 500
-    索敌_中型 
-    Delay 500
-    索敌_大型 
-    ReleaseCapture
+    // KeepCapture 
+    If ReadUIConfig("捡问号") Then 
+        //TracePrint "捡问号"
+        问号
+    End If
+    索敌顺序("索敌顺序0")
+    索敌顺序("索敌顺序1")
+    索敌顺序("索敌顺序2")
+    索敌顺序("索敌顺序3")
+    //  Dim xy=array()
+    //  ReleaseCapture
 Case 4
     TracePrint "在p_出击编队 "
     出击编队
@@ -251,19 +260,29 @@ Function 进入map
     Case "3-3"
     Case "3-4"
         TracePrint "进入3-4"
-        zm.Tap 635, 389'点击3-4, 关卡信息
+        zm.Tap 635, 389 '点击3-4, 关卡信息
     Case "4-1"
     Case "4-2"
     Case "4-3"
     Case "4-4"
     Case "5-1"
+        TracePrint "进入5-1"
+        zm.Tap  259,394
     Case "5-2"
     Case "5-3"
     Case "5-4"
     Case "6-1"
+        TracePrint "进入6-1"
+        zm.Tap 932,525
     Case "6-2"
+        TracePrint "进入6-2"
+        zm.Tap   719,369
     Case "6-3"
+        TracePrint "进入6-3"
+        zm.tap   449,244
     Case "6-4"
+        TracePrint "进入6-4"
+        zm.tap  317,456
     Case "7-1"
         TracePrint "进入7-1"
         zm.Tap    232,508
@@ -277,9 +296,17 @@ Function 进入map
         TracePrint "进入7-4"
         zm.Tap   968,480
     Case "8-1"
+        TracePrint "进入8-1"
+        zm.Tap    572,214
     Case "8-2"
+        TracePrint "进入8-2"
+        zm.Tap   304,382
     Case "8-3"
+        TracePrint "进入8-3"
+        zm.Tap   364,592
     Case "8-4"
+        TracePrint "进入8-4"
+        zm.Tap  808,488 
     Case "9-1"
     Case "9-2"
     Case "9-3"
@@ -335,13 +362,14 @@ Function 战斗结束
     Do 
         If CmpColorEx(p_结算完毕, 0.9) = 1 Then '确认按钮
             zm.Tap 1193,634,2000
-        Elseif  CmpColorEx(p_获得舰娘,0.9)= 1 then
+        Elseif  CmpColorEx(p_获得舰娘,0.9)= 1 then  '获得卡片?
             TracePrint "获得卡片"
-            If CmpColorEx(p_新舰娘 ,0.9) = 1 Then
+            Delay 2000
+            If CmpColorEx(p_新舰娘 ,0.9) = 1 Then  '是新卡?
                 TracePrint "获得 新卡"
                 dim 日期= DateTime.Format("%Y-%m-%d %H.%M.%S")
                 Delay 100
-                If 获得新船时截图 Then 
+                If 获得新船时截图 Then  '截图
                     SnapShot "/storage/emulated/0/$MuMu共享文件夹/blhx/新卡" & 日期 & ".png"
                     //统计功能
                     //
@@ -358,6 +386,9 @@ Function 战斗结束
 End Function
 //
 Function 出击编队
+    //
+    检查心情
+    //
     Delay 200
     dim 自律战斗 = CmpColorEx("173|89|4AF7AD,183|86|4AF7AD,183|93|4AF7AD", 0.95) 'on/off的颜色
     If 自律战斗 = 1 Then 
@@ -408,8 +439,9 @@ Function 整理卡片
     Dim k=0
     For i = 0 To 6
         If CmpColor(183+170*i, 256,  退役颜色,0.95) > -1 Then '检查 1-7 卡片色
-            dt = zm.Delay(100, 500)
+            dt = zm.Delay(50, 200)
             zm.tap 183 + 170 * i, 256, dt
+            信息(0)
             k=k+1
         Else 
             ShowMessage "位置"&i+1&"不符合"
@@ -417,8 +449,9 @@ Function 整理卡片
     Next    
     For i = 0 To 2  
         If CmpColor(183+170*i, 487,退役颜色,0.95) > -1 Then '检查 8-10 卡片色
-            dt = zm.Delay(100, 500)
+            dt = zm.Delay(50, 200)
             zm.tap 183 + 170 * i, 487, dt
+            信息(0)
             k=k+1
         Else 
             ShowMessage "位置"&i+8&"不符合"
@@ -449,7 +482,7 @@ End Function
 //
 Function 索敌_小型
     ShowMessage "索敌_小型"
-    FindMultiColor 117, 52, 1247, 632, "10BADE","5|0|10BADE,10|0|10BADE,15|0|10AACE", 0, 0.95, intx, inty
+    FindMultiColor 124,173,1240,632, "10BADE","5|0|10BADE,10|0|10BADE,15|0|10AACE", 0, 0.95, intx, inty
     If intx > -1 Then 
         TracePrint "找到小型",intx&","&inty
         移动
@@ -457,7 +490,7 @@ Function 索敌_小型
 End Function
 Function 索敌_中型
     ShowMessage "索敌_中型"
-    FindMultiColor 117, 52, 1247, 632, "00A6EF","5|0|00A6EF,10|0|00A6EF,15|0|00A6EF", 0, 0.97, intx, inty
+    FindMultiColor 124,173,1240,632, "00A6EF","5|0|00A6EF,10|0|00A6EF,15|0|00A6EF", 0, 0.95, intx, inty
     If intx > -1 Then 
         TracePrint "找到中型",intx&","&inty
         移动
@@ -465,7 +498,7 @@ Function 索敌_中型
 End Function
 Function 索敌_大型
     ShowMessage "索敌_大型"
-    FindMultiColor 117, 52, 1247, 632, "0034BD","5|0|0034BD,10|0|0034BD,15|0|0034BD", 0, 0.95, intx, inty
+    FindMultiColor 124,173,1240,632, "0034BD","5|0|0034BD,10|0|0034BD,15|0|0034BD", 0, 0.95, intx, inty
     If intx > -1 Then 
         TracePrint "找到大型",intx&","&inty
         移动
@@ -473,7 +506,7 @@ Function 索敌_大型
 End Function
 Function 索敌_boss
     ShowMessage "索敌_boss"
-    FindMultiColor 117, 52, 1247, 632, "524DFF","0|-2|524DFF,-3|-1|524DFF,11|-4|292439,14|-7|292439", 0, 0.95, intx, inty
+    FindMultiColor 124,173,1240,632, "524DFF","0|-2|524DFF,-3|-1|524DFF,11|-4|292439,14|-7|292439", 0, 0.95, intx, inty
     If intx > -1 Then 
         TracePrint "找到boss!!",intx&","&inty
         移动
@@ -526,7 +559,7 @@ Sub 紧急委托
             TracePrint "紧急委托,关闭"
             zm.tap  726,517,10*1000
         End If
-        Delay 1000
+        Delay 1500
     Loop 
 End Sub
 //
@@ -544,7 +577,7 @@ End sub
 Function 问号
     FindMultiColor 0,0,0,0,"F7FF94","32|0|EFEFEF,3|20|F7F3F7,8|0|292829",0,0.9,intX,intY
     If intX > -1 And intY > -1 Then 
-        TracePrint "////////////////////////////捡问号"
+        TracePrint "////////////////////////////捡问号",intX,inty+60
         Tap intX,inty+60
     End If
 End Function
@@ -589,3 +622,92 @@ Sub 检查黄色按钮
     //    loop
 End Sub
 //
+Sub 计时
+    //
+    dim t = 0
+    do
+        t = t + 1
+        Delay 1000
+        dim h= Int(t/3600)
+        dim m= int((t-h*3600)/60)
+        dim s= t-h*3600-m*60  
+        TracePrint "////////////////////////////////////////////经过时间 =",h&"时",m&"分",s&"秒"
+        // ShowMessage "经过时间 ="&h&"时"&m&"分"&s&"秒",1000,260,0
+    Loop 
+    //
+End Sub
+//
+Function 信息(a)
+    If CmpColorEx("926|188|42D7FF,959|189|ADAAAD,658|173|F7F3EF,672|206|DEDFDE,496|201|000000,308|166|F7F3EF,344|198|10BEFF",0.9) = 1 Then
+        TracePrint "p_信息"
+        If a = 0 Then 
+            TracePrint  "直接关闭信息"
+            zm.tap 947,205,100
+        End If
+        If a = 1 Then '点击黄色按钮
+            Dim intX,intY
+            FindMultiColor 0,0,0,0,"18BAFF","2|-46|003894,-176|-48|52E3FF,-176|-1|18B6FF,-90|-3|10AEFF",0,0.9,intX,intY
+            If intX > -1 And intY > -1 Then
+                zm.Tap intX,intY,100
+            End If
+        End If
+    Else
+        TracePrint "没有信息"
+    End If
+End Function
+Function 索敌顺序(名称)
+    Select Case ReadUIConfig(名称)
+    Case 0
+        索敌_boss 
+    Case 1
+        索敌_小型 
+    Case 2
+        索敌_中型 
+    Case 3
+        索敌_大型
+        // Case 4
+        //     索敌_小型 	
+    End Select
+    Delay 200
+End Function
+Function 检查心情
+    TracePrint "{检查心情}"
+    //绿  6BE794  黄 73C3FF  红 6B7DFF 
+    Dim 前锋1=CmpColor(490,442, "6BE794|73C3FF|6B7DFF" , 0.95)
+    Dim 前锋2=CmpColor(630,352, "6BE794|73C3FF|6B7DFF" , 0.95)
+    Dim 前锋3=CmpColor(743,284, "6BE794|73C3FF|6B7DFF" , 0.95)
+    Dim 主力1=CmpColor(276,342, "6BE794|73C3FF|6B7DFF" , 0.95)
+    Dim 主力2=CmpColor(418,266, "6BE794|73C3FF|6B7DFF" , 0.95)
+    Dim 主力3=CmpColor(541,202, "6BE794|73C3FF|6B7DFF" , 0.95) 
+    //
+    Dim 数组=array(前锋1 ,前锋2 ,前锋3 ,主力1 ,主力2 ,主力3)
+    dim 脸色=	ReadUIConfig("脸色")
+    For i = 0 To 5
+        If 数组(i) >= 脸色 Then 
+            TracePrint  "注意脸色!!!!","位置: ",i,"     类型: ",数组(i) 
+            If ReadUIConfig("心情休息") Then 
+                Delay ReadUIConfig("设定休息时间")*60*1000
+            End If
+            If ReadUIConfig("心情中止") Then 
+                EndScript '结束脚本
+            End If
+            Exit For
+        End If
+    Next
+    //        Select Case 数组(i)
+    //            // Case -1
+    //            //     TracePrint "//////////////////////////心情值正常"
+    //        Case 2
+    //            TracePrint "///////////////位置: ",i+1
+    //            TracePrint "心情警示：","红"
+    //            Exit for
+    //        Case 1
+    //            TracePrint "///////////////位置: ",i+1
+    //            TracePrint "心情警示：","黄"
+    //            Exit for
+    //        Case 0
+    //            TracePrint "///////////////位置: ",i+1
+    //            TracePrint "心情警示：","绿"
+    //            Exit for
+    //        End Select
+End Function
