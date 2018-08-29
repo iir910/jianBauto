@@ -18,6 +18,9 @@ Dim 模式,章节设定值,获得新船时截图,完成选章节
 Dim 轮数=0
 Dim 战斗合计=0
 dim 战斗次数=0
+Dim 索敌结果
+Dim 索敌失败次数
+dim 划图方向=0
 //Dim 首页(),章节(),选择舰队,战斗中
 dim p_首页 = "812|362|F7DF18,799|379|F7A610,777|425|523408,1011|361|42EBFF,1007|391|10A6E7,980|424|00387B"
 dim p_章节 = "740|676|EFC7A5,764|680|8C6952,942|617|949E7B,972|617|B59694,1144|627|DEEFFF,1173|639|2120FF"
@@ -55,11 +58,9 @@ If 是否退役 Then
     Case 2
         退役颜色 = "E7E7E7|E7CF9C"
         TracePrint "////////////////////船坞满了时,退役 白+蓝 "
-    Case Else
-        //否则
     End Select
 Else 
-    TracePrint    "不退役"
+    TracePrint    "船坞满了时,不退役"
 End If
 //判断模式
 If ReadUIConfig("刷章节") Then 
@@ -89,9 +90,6 @@ If ReadUIConfig("刷好感") Then
 End If
 TracePrint "////////////////////////模式="&模式
 //
-//ReadUIConfig("索敌顺序1")
-TracePrint ReadUIConfig("索敌顺序1")
-//
 获得新船时截图 = ReadUIConfig("获得新船时截图")
 TracePrint "//////////////////////获得新船时截图 =",获得新船时截图
 ///////////////////////////////////////////////////////////////////
@@ -102,20 +100,18 @@ Thread.Start 紧急委托
 Thread.Start 跳过剧情
 //Thread.Start 计时
 //////////////////////////////
-Dim 界面判断()
+Dim 界面图组()
 Rem 主
-界面判断 = Array(p_首页, p_章节,p_战斗中,p_map,p_出击编队,p_战斗结束,p_遇到伏击,p_获得道具)  '可自由添加 界面
+界面图组 = Array(p_首页, p_章节,p_战斗中,p_map,p_出击编队,p_战斗结束,p_遇到伏击,p_获得道具)  '可自由添加 界面
 Do
     i=0
-    For Each 多点颜色 In 界面判断
-        // TracePrint 多点颜色
-        If CmpColorEx(多点颜色, 0.9) = 1 Then 
-            TracePrint "///////////界面判断.已识别 = 界面判断("&i&")"
-            //        Goto 目标
+    For Each 颜色数据 In 界面图组
+        If CmpColorEx(颜色数据, 0.9) = 1 Then 
+            TracePrint "///////////界面图组.已识别 = 界面图组("&i&")"
             Exit For
         Else 
-            TracePrint "///////////界面判断("&i&") 没找到!"
-            If i < UBOUND(界面判断) Then 
+            TracePrint "///////////界面图组("&i&") 没找到!"
+            If i < UBOUND(界面图组) Then 
                 i = i + 1
             Else 
                 i=-1
@@ -126,13 +122,15 @@ Do
     //
     If i <> -1 Then 
         Exit Do
+    Else 
+        //预留此处,作统计"找图失败次数"用
+        //
     End If
     // 第?遍
-    TracePrint  "第?遍"
+    //TracePrint  "第?遍"
     Delay 100
-Loop 
-Rem 目标
-TracePrint "--------------------------------",i
+Loop '此循环判断,当前处于哪张图,返回的序号为i ,没找到返回 i=-1
+TracePrint "--------------------------返回的图序号=",i
 Select Case i
 Case 0
     TracePrint "在首页"
@@ -151,7 +149,7 @@ Case 1
             zm.tap 69,42,1000
         End If
         选章节 
-        进入map
+       // 从章节进入map
     End If
     If 模式 = 2 Then 
         If mm <> 1 Then 
@@ -166,18 +164,8 @@ Case 2
     ShowMessage "轮数 = "&轮数&"\n战斗次数 = "&战斗次数&"\n战斗合计 = "&战斗合计  //&"\n"&"经过时间 ="&h&"时"&m&"分"&s&"秒"   //,1000,260,0
     //战斗
 Case 3
-    TracePrint "在map "
-    // KeepCapture 
-    If ReadUIConfig("捡问号") Then 
-        //TracePrint "捡问号"
-        问号
-    End If
-    索敌顺序("索敌顺序0")
-    索敌顺序("索敌顺序1")
-    索敌顺序("索敌顺序2")
-    索敌顺序("索敌顺序3")
-    //  Dim xy=array()
-    //  ReleaseCapture
+    TracePrint "在p_map "
+    在map
 Case 4
     TracePrint "在p_出击编队 "
     出击编队
@@ -199,14 +187,52 @@ Goto 主
 //
 //////////////功能函数////////////
 Function 首页
-    //  TracePrint "在首页"
+    TracePrint "在首页"
+    //收任务和资源
+    If ReadUIConfig("收资金和石油") Then 
+        TracePrint "收资金和石油"
+        zm.Tap 25,442 '点左侧栏
+        Delay 2000
+        zm.Tap 162, 127 '点石油
+        Delay 500
+        zm.Tap 407,134 '点物资
+    End If
+    // //收委托
+    //
+    If ReadUIConfig("收任务奖励") Then 
+        TracePrint "收任务奖励"
+        Dim 任务栏红点=CmpColorEx("927|674|1800EF,939|675|1800E7,933|679|FFFFFF,933|668|FFFFFF,928|677|1800E7",0.9)
+        Dim 奖励红点=CmpColorEx("1195|108|FFFFFF,1074|119|39CFFF,1199|104|1800EF,1189|140|10AAFF",0.9)
+        //
+        If  任务栏红点= 1 Then
+            TracePrint "有任务奖励,打开"
+            zm.Tap 928, 701
+            Delay 2000
+            //TracePrint "奖励=",奖励红点
+            //循环,检查红点
+            Do
+                Delay 500
+                If 奖励红点 = 1 Then 
+                    Tap 1185, 140 '点击红点
+                    Delay 1000
+                    Tap 300, 140  '获取道具 ,关闭窗口
+                    Delay 1500
+                    //获得舰娘??
+                    //处理
+                Else 
+                    exit do
+                End If
+            Loop 
+        End If
+    End If
+    //
     Select Case 模式
     Case 1
         zm.tap 1176,426,500 '出击
         选章节 
         //        Delay 1500
         //       TracePrint "888"
-        进入map
+        //从章节进入map
     Case 2 '活动
         zm.tap 714, 185, 1000 '活动
         zm.Tap 855, 422, 1000  'sp3
@@ -220,7 +246,7 @@ End Function
 Function 选章节
     If ReadUIConfig("每次都重置章节")=false and 完成选章节=1  Then 
         TracePrint "不用重置章节"
-        Exit Function
+        Exit Function '结束该函数
     End If
     ShowMessage "开始重置章节"
     If 模式 = 1 Then 
@@ -242,35 +268,72 @@ Function 选章节
     Delay 1000
     完成选章节 = 1
     TracePrint "完成选章节"
+    从章节进入map
 End Function
 //
-Function 进入map
+Function 从章节进入map
     //	zm.SetTap {"minx":-50, "maxx":1, "miny":-50, "maxy":3, "t":50,"mintouch":10, "maxtouch":30, "showlog":"显示"}
     Select Case 章节设定值
     Case "1-1"
+        TracePrint "进入1-1"
+        zm.Tap 170,483
     Case "1-2"
+        TracePrint "进入1-2"
+        zm.Tap 477,299
     Case "1-3"
+        TracePrint "进入1-3"
+        zm.Tap 684,555
     Case "1-4"
+        TracePrint "进入1-4"
+        zm.Tap 812,202
     Case "2-1"
+        TracePrint "进入2-1"
+        zm.Tap 837,479
     Case "2-2"
+        TracePrint "进入2-2"
+        zm.Tap 771,207
     Case "2-3"
+        TracePrint "进入2-3"
+        zm.Tap 311,295
     Case "2-4"
+        TracePrint "进入2-4"
+        zm.Tap 407,571
     Case "3-1"
+        TracePrint "进入3-1"
+        zm.Tap 426,247
     Case "3-2"
+        TracePrint "进入3-2"
+        zm.Tap 253,523
     Case "3-3"
+        TracePrint "进入3-3"
+        zm.Tap 811,160
     Case "3-4"
         TracePrint "进入3-4"
         zm.Tap 635, 389 '点击3-4, 关卡信息
     Case "4-1"
+        TracePrint "进入4-1"
+        zm.Tap 261,331
     Case "4-2"
+        TracePrint "进入4-2"
+        zm.Tap 443,494
     Case "4-3"
+        TracePrint "进入4-3"
+        zm.Tap 841,575
     Case "4-4"
+        TracePrint "进入4-4"
+        zm.Tap 796,315
     Case "5-1"
         TracePrint "进入5-1"
         zm.Tap  259,394
     Case "5-2"
+        TracePrint "进入5-2"
+        zm.Tap 874,566
     Case "5-3"
+        TracePrint "进入5-3"
+        zm.Tap 760,393
     Case "5-4"
+        TracePrint "进入5-4"
+        zm.Tap 618,238
     Case "6-1"
         TracePrint "进入6-1"
         zm.Tap 932,525
@@ -308,21 +371,53 @@ Function 进入map
         TracePrint "进入8-4"
         zm.Tap  808,488 
     Case "9-1"
+        TracePrint "进入9-1"
+        zm.Tap 263,265
     Case "9-2"
+        TracePrint "进入9-2"
+        zm.Tap 406,508
     Case "9-3"
+        TracePrint "进入9-3"
+        zm.Tap 810,291
     Case "9-4"
+        TracePrint "进入9-4"
+        zm.Tap 940,543
     Case "10-1"
+        TracePrint "进入10-1"
+        //  zm.Tap 
     Case "10-2"
+        TracePrint "进入10-2"
+        // zm.Tap 
     Case "10-3"
+        TracePrint "进入10-3"
+        //  zm.Tap 
     Case "10-4"
+        TracePrint "进入10-4"
+        //  zm.Tap 
     Case "11-1"
+        TracePrint "进入11-1"
+        //  zm.Tap 
     Case "11-2"
+        TracePrint "进入11-2"
+        // zm.Tap 
     Case "11-3"
+        TracePrint "进入11-3"
+        //zm.Tap 
     Case "11-4"
+        TracePrint "进入11-4"
+        // zm.Tap 
     Case "12-1"
+        TracePrint "进入12-1"
+        //  zm.Tap 
     Case "12-2"
+        TracePrint "进入12-2"
+        // zm.Tap 
     Case "12-3"
+        TracePrint "进入12-3"
+        //zm.Tap 
     Case "12-4"
+        TracePrint "进入12-4"
+        // zm.Tap 
     End Select
     Delay 1000
     zm.tap 1015,502,1000 '立即前往1
@@ -349,6 +444,28 @@ Function 舰队选择
     战斗次数=0
 End Function
 //
+Function 在map
+    // KeepCapture 
+    If ReadUIConfig("捡问号") Then 
+        问号
+    End If
+    //
+    索敌失败次数=0
+    索敌顺序 ("索敌顺序0")
+    //    If 索敌结果 = 0 Then 
+    //        累计=累计+1	
+    //    End If
+    索敌顺序 ("索敌顺序1")
+    索敌顺序("索敌顺序2")
+    索敌顺序 ("索敌顺序3")
+    If 索敌失败次数=4 Then 
+        //
+        调整地图
+    End If 
+    //  Dim xy=array()
+    //  ReleaseCapture
+End Function
+//
 Function 战斗结束
     TracePrint  "战斗结束,判断win?"
     战斗次数 = 战斗次数 + 1
@@ -360,9 +477,9 @@ Function 战斗结束
     i=0
     //获得卡片?
     Do 
-        If CmpColorEx(p_结算完毕, 0.9) = 1 Then '确认按钮
+        If CmpColorEx(p_结算完毕, 0.9) = 1 Then '找确认按钮
             zm.Tap 1193,634,2000
-        Elseif  CmpColorEx(p_获得舰娘,0.9)= 1 then  '获得卡片?
+        Elseif  CmpColorEx(p_获得舰娘,0.9)= 1 then  '没有就, 获得卡片?
             TracePrint "获得卡片"
             Delay 2000
             If CmpColorEx(p_新舰娘 ,0.9) = 1 Then  '是新卡?
@@ -477,47 +594,89 @@ Function 整理卡片
     TracePrint "返回"
 End Function
 //
-Function 索敌
+//Function 索敌
+//End Function
+//
+Function 索敌顺序(名称)
+    Select Case ReadUIConfig(名称)
+    Case 0
+        索敌_boss 
+    Case 1
+        索敌_小型 
+    Case 2
+        索敌_中型 
+    Case 3
+        索敌_大型	
+    End Select
+    Delay 200
 End Function
 //
 Function 索敌_小型
-    ShowMessage "索敌_小型"
+    ShowMessage "索敌_小型",1000,1000,650
     FindMultiColor 124,173,1240,632, "10BADE","5|0|10BADE,10|0|10BADE,15|0|10AACE", 0, 0.95, intx, inty
     If intx > -1 Then 
         TracePrint "找到小型",intx&","&inty
-        移动
+        移动 
+    Else 
+        索敌结果 = 0
+        索敌失败次数=索敌失败次数+1
     End If
 End Function
 Function 索敌_中型
-    ShowMessage "索敌_中型"
+    ShowMessage "索敌_中型",1000,1000,650
     FindMultiColor 124,173,1240,632, "00A6EF","5|0|00A6EF,10|0|00A6EF,15|0|00A6EF", 0, 0.95, intx, inty
     If intx > -1 Then 
         TracePrint "找到中型",intx&","&inty
         移动
+    Else 
+        索敌结果 = 0
+        索敌失败次数=索敌失败次数+1
     End If
 End Function
 Function 索敌_大型
-    ShowMessage "索敌_大型"
+    ShowMessage "索敌_大型",1000,1000,650
     FindMultiColor 124,173,1240,632, "0034BD","5|0|0034BD,10|0|0034BD,15|0|0034BD", 0, 0.95, intx, inty
     If intx > -1 Then 
         TracePrint "找到大型",intx&","&inty
         移动
+    Else 
+        索敌结果 = 0
+        索敌失败次数=索敌失败次数+1
     End If
 End Function
 Function 索敌_boss
-    ShowMessage "索敌_boss"
+    ShowMessage "索敌_boss",1000,1000,650
     FindMultiColor 124,173,1240,632, "524DFF","0|-2|524DFF,-3|-1|524DFF,11|-4|292439,14|-7|292439", 0, 0.95, intx, inty
     If intx > -1 Then 
         TracePrint "找到boss!!",intx&","&inty
-        移动
+        //换队伍
+        If CmpColorEx("214|67|ADEBFF,207|68|ADEBFF,215|77|6BD7FF,215|97|00BAFF,210|88|21C3F7,219|78|424142",0.9) = 1 Then
+            TracePrint "第1舰队"
+            zm.tap 1009,682,500
+        Else
+            TracePrint 0
+        End If
+        //
+        If CmpColorEx("205|89|18BEF7,214|99|00BAF7,220|90|18BEF7,214|62|ADD7E7,204|67|ADEBFF,223|71|A5EBFF,223|84|31C3F7,217|100|00BAF7,213|90|39384A",0.9) = 1 Then
+            TracePrint "第3舰队"
+            移动
+        Else
+            TracePrint 0
+        End If
+    Else 
+        索敌结果 = 0
+        索敌失败次数=索敌失败次数+1
     End If
 End Function
 //
 Function 移动
+    TracePrint "{移动}"
+    索敌结果=1
     Randomize
     dim 偏移x= Int((60 - 20 + 1) * Rnd() + 20)
     dim 偏移y= Int((35 - 20 + 1) * Rnd() + 20)
     Tap intx + 偏移x, inty + 偏移y
+    Delay 2000
     //
 End Function
 //
@@ -590,36 +749,7 @@ Function 获得道具
 End Function
 //
 Sub 检查黄色按钮
-    //    Do
-    //        KeepCapture 
-    //        Delay 100
-    //        //dim 按钮色=array("10AEFF","6|-45|003894,-171|2|18B6FF,-173|-44|52DBFF,17|13|181818,-117|-49|CEFFFF")
-    //        FindMultiColor 0,0,0,0,"18AEFF","2|-42|003494,-168|-41|4ADFFF,-167|1|18B6FF",0,0.95,intX,intY
-    //        If intX > -1 And intY > -1 Then 
-    //            
-    //            Dim 选舰队="1138|642|10AEFF,1138|160|635142,1141|96|42D7FF,1171|96|ADAAAD,419|85|F7F3EF"
-    //            Dim 满了="576|518|18B6FF,954|191|ADAAAD,436|179|525152,876|514|10AAFF,579|473|00309C,879|473|00309C"
-    //            If CmpColorEx(遇到伏击,0.9) = 1 Then  '属于特殊情况?
-    //                TracePrint "//////////////发现黄色按钮: 遇到伏击"
-    //                //ReadUIConfig("伏击")
-    //                TracePrint "//////////////尝试规避"
-    //                zm.tap 999, 403, 1000
-    //                //检查规避成功?
-    //                //
-    //            ElseIf CmpColorEx(选舰队, 0.9) = 1 Then
-    //                TracePrint "发现黄色按钮: 选舰队图"
-    //            ElseIf CmpColorEx(满了, 0.9) = 1 Then
-    //                TracePrint "发现黄色按钮: 满了"
-    //                Delay 35000
-    //            else  '非特殊情况
-    //                ShowMessage "发现黄色按钮..点击"
-    //                TracePrint "\\\\\\\\\\\\\\\\\\\\\\发现黄色按钮..点击"
-    //                zm.Tap intX,inty,1000
-    //            End If
-    //        End If
-    //        Delay 1000
-    //        ReleaseCapture
-    //    loop
+    //
 End Sub
 //
 Sub 计时
@@ -655,21 +785,7 @@ Function 信息(a)
         TracePrint "没有信息"
     End If
 End Function
-Function 索敌顺序(名称)
-    Select Case ReadUIConfig(名称)
-    Case 0
-        索敌_boss 
-    Case 1
-        索敌_小型 
-    Case 2
-        索敌_中型 
-    Case 3
-        索敌_大型
-        // Case 4
-        //     索敌_小型 	
-    End Select
-    Delay 200
-End Function
+
 Function 检查心情
     TracePrint "{检查心情}"
     //绿  6BE794  黄 73C3FF  红 6B7DFF 
@@ -694,20 +810,35 @@ Function 检查心情
             Exit For
         End If
     Next
-    //        Select Case 数组(i)
-    //            // Case -1
-    //            //     TracePrint "//////////////////////////心情值正常"
-    //        Case 2
-    //            TracePrint "///////////////位置: ",i+1
-    //            TracePrint "心情警示：","红"
-    //            Exit for
-    //        Case 1
-    //            TracePrint "///////////////位置: ",i+1
-    //            TracePrint "心情警示：","黄"
-    //            Exit for
-    //        Case 0
-    //            TracePrint "///////////////位置: ",i+1
-    //            TracePrint "心情警示：","绿"
-    //            Exit for
-    //        End Select
+End Function
+Function 调整地图
+    //
+    Dim 结果
+    Dim xx,yy  '划图原点坐标值,暂定。以后可能改成随机值.
+    xx = 600
+    yy = 400
+    划图方向 =划图方向+1  
+    结果 = 划图方向 Mod 4 '取余数,再根据余数0~3来决定划图方向
+    TracePrint "划图方向="&划图方向,"计算结果为：" & 结果
+    Select Case 结果
+    Case 0
+        ShowMessage "→ 右"
+        Delay 1000
+        Swipe xx,yy, xx - 400, yy, 200 '右移动
+        Delay 1000
+    Case 1
+        ShowMessage "↑ 上 "
+        Delay 1000
+        Swipe xx, yy, xx, yy + 300, 200 '上移动
+    Case 2
+        ShowMessage "← 左 "
+        Delay 1000
+        Swipe xx, yy, xx+400, yy, 200 '左移动
+        Delay 1000
+    Case 3
+        ShowMessage "↓ 下"
+        Delay 1000
+        Swipe xx,yy, xx, yy-300, 200  '下移动
+        Delay 1000
+    End Select
 End Function
