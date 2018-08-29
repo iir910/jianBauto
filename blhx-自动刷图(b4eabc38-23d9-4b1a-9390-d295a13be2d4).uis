@@ -19,10 +19,17 @@ Function mode4()
     UIP.SetAttribute "刷活动", {"选中":false}
     UIP.SetAttribute "炼金术", {"选中":false}
 End Function
-//
+//舰娘脸色变化时
 Function 心情处理1
     UIP.SetAttribute "心情中止", {"选中":false}
 End Function
 Function 心情处理2
     UIP.SetAttribute "心情休息", {"选中":false}
+End Function
+//打boss的队伍2选1
+Function boss切队1
+    UIP.SetAttribute "boss切队2", {"选中":false}
+End Function
+Function boss切队2
+    UIP.SetAttribute "boss切队1", {"选中":false}
 End Function
