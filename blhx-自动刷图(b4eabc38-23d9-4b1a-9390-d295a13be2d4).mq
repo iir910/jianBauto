@@ -92,6 +92,7 @@ TracePrint "////////////////////////模式="&模式
 //
 获得新船时截图 = ReadUIConfig("获得新船时截图")
 TracePrint "//////////////////////获得新船时截图 =",获得新船时截图
+//
 ///////////////////////////////////////////////////////////////////
 //
 //TracePrint "启动线程: 检查黄色按钮"
@@ -149,7 +150,7 @@ Case 1
             zm.tap 69,42,1000
         End If
         选章节 
-       // 从章节进入map
+        // 从章节进入map
     End If
     If 模式 = 2 Then 
         If mm <> 1 Then 
@@ -187,7 +188,7 @@ Goto 主
 //
 //////////////功能函数////////////
 Function 首页
-    TracePrint "在首页"
+    TracePrint "{首页}"
     //收任务和资源
     If ReadUIConfig("收资金和石油") Then 
         TracePrint "收资金和石油"
@@ -196,40 +197,54 @@ Function 首页
         zm.Tap 162, 127 '点石油
         Delay 500
         zm.Tap 407,134 '点物资
+        Delay 2000
     End If
-    // //收委托
+    //    If ReadUIConfig("收任务奖励") Then 
+    //    	
+    //    End If
+    //    If CmpColorEx("195|201|424542,428|193|4A494A,330|135|3145CE,66|138|9C694A,262|176|DEDBD6,504|201|4A4942",0.9) = 1 Then
     //
-    If ReadUIConfig("收任务奖励") Then 
-        TracePrint "收任务奖励"
-        Dim 任务栏红点=CmpColorEx("927|674|1800EF,939|675|1800E7,933|679|FFFFFF,933|668|FFFFFF,928|677|1800E7",0.9)
-        Dim 奖励红点=CmpColorEx("1195|108|FFFFFF,1074|119|39CFFF,1199|104|1800EF,1189|140|10AAFF",0.9)
-        //
-        If  任务栏红点= 1 Then
-            TracePrint "有任务奖励,打开"
-            zm.Tap 928, 701
-            Delay 2000
-            //TracePrint "奖励=",奖励红点
-            //循环,检查红点
-            Do
-                Delay 500
-                If 奖励红点 = 1 Then 
-                    Tap 1185, 140 '点击红点
-                    Delay 1000
-                    Tap 300, 140  '获取道具 ,关闭窗口
-                    Delay 1500
-                    //获得舰娘??
-                    //处理
-                Else 
-                    exit do
-                End If
-            Loop 
-        End If
+    // //收委托
+    dim 委托完成="485|304|18AAFF,497|277|1800EF,502|281|FFFFFF,506|274|2108E7,490|292|39CFFF"
+    While ReadUIConfig("收任务奖励") and CmpColorEx(委托完成, 0.9) = 1
+        TracePrint "收委托"
+        zm.Tap 488, 309, 1000
+        zm.Tap 269,244, 1000 '经验
+        zm.Tap 269,244, 1000 '道具
+    Wend
+    //
+    zm.Tap 723,508 '关闭侧边栏
+    //
+    Delay 1500
+    //TracePrint "收任务奖励"
+    Dim 任务栏红点="927|674|1800EF,939|675|1800E7,933|679|FFFFFF,933|668|FFFFFF,928|677|1800E7"
+    Dim 奖励红点="1195|108|FFFFFF,1074|119|39CFFF,1199|104|1800EF,1189|140|10AAFF"
+    If ReadUIConfig("收任务奖励") and CmpColorEx(任务栏红点,0.9)= 1 Then 
+        //TracePrint "收任务奖励"
+        TracePrint "有任务奖励,打开"
+        zm.Tap 928, 701
+        Delay 1000
+        //TracePrint "奖励=",奖励红点
+        //循环,检查红点
+        Do While CmpColorEx(奖励红点, 0.9) = 1
+            TracePrint "有奖励"
+            Delay 500
+            Tap 1185, 140 '点击红点
+            Delay 1000
+            Tap 300, 140  '获取道具 ,关闭窗口
+            Delay 1000
+            //获得舰娘??
+            //处理
+            zm.Tap 66,31 '返回
+            Delay 1500
+        Loop 
     End If
     //
     Select Case 模式
     Case 1
         zm.tap 1176,426,500 '出击
-        选章节 
+        Exit Function
+        //选章节 
         //        Delay 1500
         //       TracePrint "888"
         //从章节进入map
@@ -246,6 +261,7 @@ End Function
 Function 选章节
     If ReadUIConfig("每次都重置章节")=false and 完成选章节=1  Then 
         TracePrint "不用重置章节"
+        从章节进入map
         Exit Function '结束该函数
     End If
     ShowMessage "开始重置章节"
@@ -447,9 +463,11 @@ End Function
 Function 在map
     // KeepCapture 
     If ReadUIConfig("捡问号") Then 
-        问号
+        捡问号
+    End If 
+    If ReadUIConfig("捡子弹") Then 
+        捡子弹
     End If
-    //
     索敌失败次数=0
     索敌顺序 ("索敌顺序0")
     //    If 索敌结果 = 0 Then 
@@ -466,41 +484,122 @@ Function 在map
     //  ReleaseCapture
 End Function
 //
-Function 战斗结束
-    TracePrint  "战斗结束,判断win?"
-    战斗次数 = 战斗次数 + 1
-    战斗合计 = 战斗合计 +1
-    Delay 1000 
-    zm.Tap 340,400,1000 '结束战斗
-    zm.tap 635,647,1000  '获得道具
-    //   zm.FindMultiColor()
-    i=0
-    //获得卡片?
-    Do 
-        If CmpColorEx(p_结算完毕, 0.9) = 1 Then '找确认按钮
-            zm.Tap 1193,634,2000
-        Elseif  CmpColorEx(p_获得舰娘,0.9)= 1 then  '没有就, 获得卡片?
-            TracePrint "获得卡片"
-            Delay 2000
-            If CmpColorEx(p_新舰娘 ,0.9) = 1 Then  '是新卡?
-                TracePrint "获得 新卡"
-                dim 日期= DateTime.Format("%Y-%m-%d %H.%M.%S")
-                Delay 100
-                If 获得新船时截图 Then  '截图
-                    SnapShot "/storage/emulated/0/$MuMu共享文件夹/blhx/新卡" & 日期 & ".png"
-                    //统计功能
-                    //
-                    Delay 500
-                End If
-            Else
-                TracePrint "不是新卡"
-            End If
-            zm.tap 1019,80,2000 '点空白处
-        End If
-        Delay 1000
-        i=i+1
-    loop Until i=5
+//Function 索敌
+//End Function
+//
+Function 索敌顺序(名称)
+    Select Case ReadUIConfig(名称)
+    Case 0
+        索敌_boss 
+    Case 1
+        索敌_小型 
+    Case 2
+        索敌_中型 
+    Case 3
+        索敌_大型	
+    End Select
+    Delay 200
 End Function
+//
+Function 索敌_小型
+    ShowMessage "索敌_小型",1000,1000,650
+    FindMultiColor 124,173,1240,632, "10BADE","5|0|10BADE,10|0|10BADE,15|0|10AACE", 0, 0.95, intx, inty
+    If intx > -1 Then 
+        TracePrint "找到小型",intx&","&inty
+        移动 
+    Else 
+        索敌结果 = 0
+        索敌失败次数=索敌失败次数+1
+    End If
+End Function
+Function 索敌_中型
+    ShowMessage "索敌_中型",1000,1000,650
+    FindMultiColor 124,173,1240,632, "00A6EF","5|0|00A6EF,10|0|00A6EF,15|0|00A6EF", 0, 0.95, intx, inty
+    If intx > -1 Then 
+        TracePrint "找到中型",intx&","&inty
+        移动
+    Else 
+        索敌结果 = 0
+        索敌失败次数=索敌失败次数+1
+    End If
+End Function
+Function 索敌_大型
+    ShowMessage "索敌_大型",1000,1000,650
+    FindMultiColor 124,173,1240,632, "0034BD","5|0|0034BD,10|0|0034BD,15|0|0034BD", 0, 0.95, intx, inty
+    If intx > -1 Then 
+        TracePrint "找到大型",intx&","&inty
+        移动
+    Else 
+        索敌结果 = 0
+        索敌失败次数=索敌失败次数+1
+    End If
+End Function
+Function 索敌_boss
+    ShowMessage "索敌_boss",1000,1000,650
+    FindMultiColor 124,173,1240,632, "524DFF","0|-2|524DFF,-3|-1|524DFF,11|-4|292439,14|-7|292439", 0, 0.95, intx, inty
+    If intx > -1 Then 
+        TracePrint "找到boss!!坐标 : ",intx&","&inty
+        //换队伍
+        Dim 舰队1 = "214|67|ADEBFF,207|68|ADEBFF,215|77|6BD7FF,215|97|00BAFF,210|88|21C3F7,219|78|424142"
+        //Dim 舰队2=
+        Dim 舰队3 ="205|89|18BEF7,214|99|00BAF7,220|90|18BEF7,214|62|ADD7E7,204|67|ADEBFF,223|71|A5EBFF,223|84|31C3F7,217|100|00BAF7,213|90|39384A"
+        //Dim 舰队4=
+        //Dim 舰队5=
+        //Dim 舰队6=
+        //ReadUIConfig   读取打boss的队伍
+        If  CmpColorEx(舰队1,0.92) = 1 Then
+            TracePrint "///////////////////当前是:第1舰队"
+            zm.tap 1009,682,500 '切换
+            Delay 1000
+        End If
+        //
+        If   CmpColorEx(舰队3,0.92) = 1 Then
+            TracePrint "///////////////////当前是:第3舰队"
+            Delay 1000
+            //移动
+        Else 
+            TracePrint "nnn"
+        End If
+        //切换队伍后,强制搜索boss
+        //dim sboss
+        FindMultiColor(124,173,1240,632, "524DFF","0|-2|524DFF,-3|-1|524DFF,11|-4|292439,14|-7|292439", 0, 0.95, intx, inty)
+        While intx = -1
+            调整地图 
+            Delay 1000
+            FindMultiColor(124,173,1240,632, "524DFF","0|-2|524DFF,-3|-1|524DFF,11|-4|292439,14|-7|292439", 0, 0.95, intx, inty)
+        Wend
+        TracePrint "强制,找到boss!!坐标 : ",intx&","&inty
+        //
+        移动 
+        ///////
+    Else 
+        索敌结果 = 0
+        索敌失败次数=索敌失败次数+1
+    End If
+End Function
+//
+Function 移动
+    TracePrint "{移动}"
+    索敌结果=1
+    Randomize
+    dim 偏移x= Int((60 - 20 + 1) * Rnd() + 20)
+    dim 偏移y= Int((35 - 20 + 1) * Rnd() + 20)
+    Tap intx + 偏移x, inty + 偏移y
+    Delay 2000
+    //
+End Function
+//
+Function 遇到伏击
+    //
+    If ReadUIConfig("伏击", true) Then 
+        TracePrint "规避"
+        zm.tap	1008,404
+    Else 
+        TracePrint "迎击"
+        zm.tap 721,405 '迎击	
+    End If
+End Function
+//
 //
 Function 出击编队
     //
@@ -580,11 +679,11 @@ Function 整理卡片
         EndScript
     End If
     zm.tap 1200,700, 1000 '确定
-    zm.Tap 1100, 650, 500 '确定
-    zm.Tap 1034, 640, 500   '获得道具
-    zm.Tap 1034, 620, 500 '装备 .确定
-    zm.Tap 850, 520, 500  '拆解
-    zm.Tap 787, 513, 500 '获得道具
+    zm.Tap 1100, 650, 1000 '确定
+    zm.Tap 1034, 640, 1000   '获得道具
+    zm.Tap 1034, 620, 1000 '装备 .确定
+    zm.Tap 850, 520, 1000  '拆解
+    zm.Tap 787, 513, 1000 '获得道具
     /*  检查第一点颜色,继续循环?
     If CmpColor(183 + 170, 256, 退役颜色, 0.95) > -1 Then 
         Goto 退役
@@ -592,103 +691,6 @@ Function 整理卡片
     */
     zm.Tap 50, 40, 1000 '返回
     TracePrint "返回"
-End Function
-//
-//Function 索敌
-//End Function
-//
-Function 索敌顺序(名称)
-    Select Case ReadUIConfig(名称)
-    Case 0
-        索敌_boss 
-    Case 1
-        索敌_小型 
-    Case 2
-        索敌_中型 
-    Case 3
-        索敌_大型	
-    End Select
-    Delay 200
-End Function
-//
-Function 索敌_小型
-    ShowMessage "索敌_小型",1000,1000,650
-    FindMultiColor 124,173,1240,632, "10BADE","5|0|10BADE,10|0|10BADE,15|0|10AACE", 0, 0.95, intx, inty
-    If intx > -1 Then 
-        TracePrint "找到小型",intx&","&inty
-        移动 
-    Else 
-        索敌结果 = 0
-        索敌失败次数=索敌失败次数+1
-    End If
-End Function
-Function 索敌_中型
-    ShowMessage "索敌_中型",1000,1000,650
-    FindMultiColor 124,173,1240,632, "00A6EF","5|0|00A6EF,10|0|00A6EF,15|0|00A6EF", 0, 0.95, intx, inty
-    If intx > -1 Then 
-        TracePrint "找到中型",intx&","&inty
-        移动
-    Else 
-        索敌结果 = 0
-        索敌失败次数=索敌失败次数+1
-    End If
-End Function
-Function 索敌_大型
-    ShowMessage "索敌_大型",1000,1000,650
-    FindMultiColor 124,173,1240,632, "0034BD","5|0|0034BD,10|0|0034BD,15|0|0034BD", 0, 0.95, intx, inty
-    If intx > -1 Then 
-        TracePrint "找到大型",intx&","&inty
-        移动
-    Else 
-        索敌结果 = 0
-        索敌失败次数=索敌失败次数+1
-    End If
-End Function
-Function 索敌_boss
-    ShowMessage "索敌_boss",1000,1000,650
-    FindMultiColor 124,173,1240,632, "524DFF","0|-2|524DFF,-3|-1|524DFF,11|-4|292439,14|-7|292439", 0, 0.95, intx, inty
-    If intx > -1 Then 
-        TracePrint "找到boss!!",intx&","&inty
-        //换队伍
-        If CmpColorEx("214|67|ADEBFF,207|68|ADEBFF,215|77|6BD7FF,215|97|00BAFF,210|88|21C3F7,219|78|424142",0.9) = 1 Then
-            TracePrint "第1舰队"
-            zm.tap 1009,682,500
-        Else
-            TracePrint 0
-        End If
-        //
-        If CmpColorEx("205|89|18BEF7,214|99|00BAF7,220|90|18BEF7,214|62|ADD7E7,204|67|ADEBFF,223|71|A5EBFF,223|84|31C3F7,217|100|00BAF7,213|90|39384A",0.9) = 1 Then
-            TracePrint "第3舰队"
-            移动
-        Else
-            TracePrint 0
-        End If
-    Else 
-        索敌结果 = 0
-        索敌失败次数=索敌失败次数+1
-    End If
-End Function
-//
-Function 移动
-    TracePrint "{移动}"
-    索敌结果=1
-    Randomize
-    dim 偏移x= Int((60 - 20 + 1) * Rnd() + 20)
-    dim 偏移y= Int((35 - 20 + 1) * Rnd() + 20)
-    Tap intx + 偏移x, inty + 偏移y
-    Delay 2000
-    //
-End Function
-//
-Function 遇到伏击
-    //
-    If ReadUIConfig("伏击", true) Then 
-        TracePrint "规避"
-        zm.tap	1008,404
-    Else 
-        TracePrint "迎击"
-        zm.tap 721,405 '迎击	
-    End If
 End Function
 //
 Function 维修
@@ -712,6 +714,42 @@ Function 维修
     End If
 End Function
 //
+Function 战斗结束
+    TracePrint  "战斗结束,判断win?"
+    战斗次数 = 战斗次数 + 1
+    战斗合计 = 战斗合计 +1
+    Delay 1000 
+    zm.Tap 340,400,1000 '结束战斗
+    zm.tap 635,647,1000  '获得道具
+    //   zm.FindMultiColor()
+    i=0
+    //获得卡片?
+    Do 
+        If CmpColorEx(p_结算完毕, 0.9) = 1 Then '找确认按钮
+            zm.Tap 1193,634,2000
+        Elseif  CmpColorEx(p_获得舰娘,0.9)= 1 then  '没有就, 获得卡片?
+            TracePrint "获得卡片"
+            Delay 2000
+            If CmpColorEx(p_新舰娘 ,0.9) = 1 Then  '是新卡?
+                TracePrint "获得 新卡"
+                dim 日期= DateTime.Format("%Y-%m-%d %H.%M.%S")
+                Delay 100
+                If 获得新船时截图 Then  '截图
+                    SnapShot "/storage/emulated/0/$MuMu共享文件夹/blhx/新卡" & 日期 & ".png"
+                    //统计功能
+                    //
+                    Delay 500
+                End If
+            Else
+                TracePrint "不是新卡"
+            End If
+            zm.tap 1019,80,2000 '点空白处
+        End If
+        Delay 1000
+        i=i+1
+    loop Until i=5
+End Function
+//
 Sub 紧急委托
     do
         If CmpColorEx("726|517|18B2FF,728|472|003894,926|189|42D7FF,963|188|ADAAAD,309|167|F7F3F7",0.9) = 1 Then
@@ -733,10 +771,24 @@ sub 跳过剧情
     loop
 End sub
 //
-Function 问号
+Function 捡问号
     FindMultiColor 0,0,0,0,"F7FF94","32|0|EFEFEF,3|20|F7F3F7,8|0|292829",0,0.9,intX,intY
     If intX > -1 And intY > -1 Then 
         TracePrint "////////////////////////////捡问号",intX,inty+60
+        Tap intX,inty+60
+    End If
+End Function
+//
+Function 捡子弹
+    //捡子弹前战斗次数
+    dim 捡子弹前战斗次数=ReadUIConfig ("捡子弹前战斗次数",3)
+    If clng(捡子弹前战斗次数) <> 战斗次数 Then 
+        //TracePrint  " "
+        Exit Function 
+    End If
+    FindMultiColor 0,0,0,0,"F7F3F7","1|-17|4A8EDE,2|-23|CEF7FF,-11|-25|08458C,26|-10|F7F3F7",0,0.9,intX,intY
+    If intX > -1 And intY > -1 Then 
+        TracePrint "////////////////////////////捡子弹",intX,inty+60
         Tap intX,inty+60
     End If
 End Function
@@ -785,7 +837,6 @@ Function 信息(a)
         TracePrint "没有信息"
     End If
 End Function
-
 Function 检查心情
     TracePrint "{检查心情}"
     //绿  6BE794  黄 73C3FF  红 6B7DFF 
