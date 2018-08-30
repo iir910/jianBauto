@@ -35,13 +35,18 @@ Dim p_新舰娘 = "139|95|7BBEFF,168|88|7BD3FF,200|75|73EBFF,262|56|7BCFFF,282|51|7
 dim p_出击编队 = "1166|657|D6CF94,1035|612|B5617B,944|614|5A75EF,1123|598|F7F3D6,1143|644|5AAEF7" '出击2
 Dim p_遇到伏击="1008|405|CECFCE,718|403|10AEFF,399|460|18714A,161|391|1069A5,1128|392|1069A5"
 Dim p_获得道具="513|141|63AEF7,776|141|63B6F7,775|182|319AF7,658|187|31DBFF,606|194|31CBFF,559|190|31AAF7"
+Dim p_黑屏="49|112|101410-000080,275|102|101410,678|125|101410,1138|112|101410,45|560|101410,388|560|101410,728|532|101410,1108|496|101410,1214|328|101410,995|221|101410"
+Dim p_信息窗口="926|188|42D7FF,959|189|ADAAAD,658|173|F7F3EF,672|206|DEDFDE,496|201|000000,308|166|F7F3EF,344|198|10BEFF"
+//Dim p_剧情对白="1260|599|846152,1251|623|8C6552,1126|620|8C614A,21|617|8C6552,47|581|A58E7B,1205|660|F7F7F7"
 //
-Dim 范围="117, 52, 1247, 632"
-//Dim 问号=124,173,1240,632,"", 0, 0.95
-//Dim 弹药=124,173,1240,632,"", 0, 0.95
-Dim x0,y0
-x0 = 117
-y0= 52
+Dim s_委托红点="29|343|FFFFFF,23|338|2100EF,35|335|3110EF,35|341|1000DE,10|336|EFEFEF"
+dim s_委托完成="485|304|18AAFF,497|277|1800EF,502|281|FFFFFF,506|274|2108E7,490|292|39CFFF"
+Dim s_任务栏红点="927|674|1800EF,939|675|1800E7,933|679|FFFFFF,933|668|FFFFFF,928|677|1800E7"
+Dim s_奖励红点="1195|108|FFFFFF,1074|119|39CFFF,1199|104|1800EF,1189|140|10AAFF"
+//Dim 范围="117, 52, 1247, 632"
+//Dim x0,y0
+//x0 = 117
+//y0= 52
 /////////////////////////////////
 zm.SetFindMultiColor {"sim":0.95, "showlog":"显示"} '多点找色-默认参数
 zm.SetTap {"minx":-30, "maxx":2, "miny":-30, "maxy":3, "t":100,"mintouch":10, "maxtouch":30, "showlog":"显示"}
@@ -51,16 +56,16 @@ If 是否退役 Then
     Select Case ReadUIConfig("退役的颜色")
     Case 0
         退役颜色 = "E7E7E7"	
-        TracePrint "船坞满了时,退役 白色"
+        TracePrint "////////////////////船坞满了时,退役 白色"
     Case 1
         退役颜色 = "E7CF9C"    
-        TracePrint "船坞满了时,退役 蓝色"
+        TracePrint "////////////////////船坞满了时,退役 蓝色"
     Case 2
         退役颜色 = "E7E7E7|E7CF9C"
         TracePrint "////////////////////船坞满了时,退役 白+蓝 "
     End Select
 Else 
-    TracePrint    "船坞满了时,不退役"
+    TracePrint    "////////////////////船坞满了时,不退役"
 End If
 //判断模式
 If ReadUIConfig("刷章节") Then 
@@ -68,7 +73,7 @@ If ReadUIConfig("刷章节") Then
     章节设定值 = ReadUIConfig("章")+1 & "-" & ReadUIConfig("节")+1
     TracePrint "////////////////////////章节设定值="&章节设定值
     //
-    TracePrint "每次都重置章节 =",ReadUIConfig("每次都重置章节")
+    TracePrint "////////////////////////每次都重置章节 =",ReadUIConfig("每次都重置章节")
 End If
 If ReadUIConfig("刷活动") Then 
     模式 = 2
@@ -93,6 +98,9 @@ TracePrint "////////////////////////模式="&模式
 获得新船时截图 = ReadUIConfig("获得新船时截图")
 TracePrint "//////////////////////获得新船时截图 =",获得新船时截图
 //
+TracePrint "////////////////////////收委托=" , ReadUIConfig("收委托奖励")
+TracePrint "////////////////////////收资源=" , ReadUIConfig ("收资金和石油")
+TracePrint "////////////////////////收任务=" , ReadUIConfig("收任务奖励") 
 ///////////////////////////////////////////////////////////////////
 //
 //TracePrint "启动线程: 检查黄色按钮"
@@ -103,7 +111,7 @@ Thread.Start 跳过剧情
 //////////////////////////////
 Dim 界面图组()
 Rem 主
-界面图组 = Array(p_首页, p_章节,p_战斗中,p_map,p_出击编队,p_战斗结束,p_遇到伏击,p_获得道具)  '可自由添加 界面
+界面图组 = Array(p_首页, p_章节,p_战斗中,p_map,p_出击编队,p_战斗结束,p_遇到伏击,p_获得道具, p_黑屏)  '可自由添加 界面
 Do
     i=0
     For Each 颜色数据 In 界面图组
@@ -178,11 +186,32 @@ Case 6
     遇到伏击
 Case 7
     TracePrint "p_获得道具 "
-    获得道具
+    获得道具 
+Case 8
+    TracePrint " p_黑屏 "
+    zm.Tap 941, 642, 2000
+    //    Do 
+    //        FindMultiColor 1162,604,1264,706,"D6C7BD","11|5|D6C7BD,18|0|D6C7BD,27|-15|F7F7F7,-12|-19|D6C7BD,2|-11|F7F7F7",0,0.95,intX,intY
+    //        If intX > -1 And intY > -1 Then
+    //            zm.tap intx,inty
+    //        End If
+    //        Delay 1000
+    //    Loop While intX > -1
+    //Case 9
+    //    TracePrint "p_剧情对白 "
+    //    Do 
+    //        FindMultiColor 1162,604,1264,706,"D6C7BD","11|5|D6C7BD,18|0|D6C7BD,27|-15|F7F7F7,-12|-19|D6C7BD,2|-11|F7F7F7",0,0.95,intX,intY
+    //        If intX > -1 And intY > -1 Then 
+    //        	
+    //       TracePrint "继续对话 "
+    //            zm.tap intx,inty
+    //        End If
+    //        Delay 1000
+    //    Loop While intX > -1
 Case Else
     TracePrint "什么都没有找到!"
 End Select  
-Delay 1000
+Delay 600
 Goto 主
 ////////////////
 //
@@ -197,36 +226,38 @@ Function 首页
         zm.Tap 162, 127 '点石油
         Delay 500
         zm.Tap 407,134 '点物资
-        Delay 2000
+        Delay 1000
+        zm.Tap 723,508 '关闭侧边栏
+        Delay 1000
     End If
-    //    If ReadUIConfig("收任务奖励") Then 
-    //    	
-    //    End If
-    //    If CmpColorEx("195|201|424542,428|193|4A494A,330|135|3145CE,66|138|9C694A,262|176|DEDBD6,504|201|4A4942",0.9) = 1 Then
-    //
     // //收委托
-    dim 委托完成="485|304|18AAFF,497|277|1800EF,502|281|FFFFFF,506|274|2108E7,490|292|39CFFF"
-    While ReadUIConfig("收任务奖励") and CmpColorEx(委托完成, 0.9) = 1
-        TracePrint "收委托"
-        zm.Tap 488, 309, 1000
-        zm.Tap 269,244, 1000 '经验
-        zm.Tap 269,244, 1000 '道具
-    Wend
+    If ReadUIConfig("收委托奖励") and CmpColorEx( s_委托红点,0.95) Then 
+        zm.Tap 25,442 '点左侧栏
+        Delay 1500
+        While  CmpColorEx(s_委托完成, 0.9) = 1
+            TracePrint "可以收委托了"
+            ShowMessage "收委托"
+            //zm.Tap 488, 309
+            zm.Tap 488, 309, 500
+            ShowMessage "确认经验"
+            zm.Tap 269,244, 1000 '经验
+            ShowMessage "确认道具"
+            zm.Tap 269,244, 1000 '道具
+        Wend
+        zm.Tap 723,508 '关闭侧边栏
+    End If
     //
-    zm.Tap 723,508 '关闭侧边栏
+//    zm.Tap 723,508 '关闭侧边栏
     //
     Delay 1500
     //TracePrint "收任务奖励"
-    Dim 任务栏红点="927|674|1800EF,939|675|1800E7,933|679|FFFFFF,933|668|FFFFFF,928|677|1800E7"
-    Dim 奖励红点="1195|108|FFFFFF,1074|119|39CFFF,1199|104|1800EF,1189|140|10AAFF"
-    If ReadUIConfig("收任务奖励") and CmpColorEx(任务栏红点,0.9)= 1 Then 
-        //TracePrint "收任务奖励"
+    If ReadUIConfig("收任务奖励") and CmpColorEx(s_任务栏红点,0.9)= 1 Then 
         TracePrint "有任务奖励,打开"
         zm.Tap 928, 701
         Delay 1000
         //TracePrint "奖励=",奖励红点
         //循环,检查红点
-        Do While CmpColorEx(奖励红点, 0.9) = 1
+        Do While CmpColorEx(s_奖励红点, 0.9) = 1
             TracePrint "有奖励"
             Delay 500
             Tap 1185, 140 '点击红点
@@ -235,9 +266,9 @@ Function 首页
             Delay 1000
             //获得舰娘??
             //处理
-            zm.Tap 66,31 '返回
-            Delay 1500
-        Loop 
+        Loop
+        zm.Tap 66,31 '返回主页
+        Delay 1500
     End If
     //
     Select Case 模式
@@ -722,7 +753,21 @@ Function 战斗结束
     zm.Tap 340,400,1000 '结束战斗
     zm.tap 635,647,1000  '获得道具
     //   zm.FindMultiColor()
-    i=0
+    判断获得舰娘
+End Function
+//
+Sub 紧急委托
+    do
+        If CmpColorEx("726|517|18B2FF,728|472|003894,926|189|42D7FF,963|188|ADAAAD,309|167|F7F3F7",0.9) = 1 Then
+            TracePrint "紧急委托,关闭"
+            zm.tap  726,517,10*1000
+        End If
+        Delay 1500
+    Loop 
+End Sub
+//
+Function 判断获得舰娘
+    dim i=0
     //获得卡片?
     Do 
         If CmpColorEx(p_结算完毕, 0.9) = 1 Then '找确认按钮
@@ -749,25 +794,15 @@ Function 战斗结束
         i=i+1
     loop Until i=5
 End Function
-//
-Sub 紧急委托
-    do
-        If CmpColorEx("726|517|18B2FF,728|472|003894,926|189|42D7FF,963|188|ADAAAD,309|167|F7F3F7",0.9) = 1 Then
-            TracePrint "紧急委托,关闭"
-            zm.tap  726,517,10*1000
-        End If
-        Delay 1500
-    Loop 
-End Sub
-//
 sub 跳过剧情
     do
         FindMultiColor 1179,604,1243,706,"D6C7BD","-10|-8|D6C7BD,8|-7|D6C7BD,-19|-21|F7F7F7,-21|-28|D6C7C6",0,0.95,intX,intY
         If intX > -1 And intY > -1 Then
-            TracePrint "跳过剧情"
+            TracePrint "自动跳过剧情"
+            ShowMessage "自动跳过剧情"
             zm.Tap 1136,679
         End If
-        Delay 1000
+        Delay 1500
     loop
 End sub
 //
@@ -800,9 +835,9 @@ Function 获得道具
     End If
 End Function
 //
-Sub 检查黄色按钮
-    //
-End Sub
+//Sub 检查黄色按钮
+//    //
+//End Sub
 //
 Sub 计时
     //
@@ -820,7 +855,7 @@ Sub 计时
 End Sub
 //
 Function 信息(a)
-    If CmpColorEx("926|188|42D7FF,959|189|ADAAAD,658|173|F7F3EF,672|206|DEDFDE,496|201|000000,308|166|F7F3EF,344|198|10BEFF",0.9) = 1 Then
+    If CmpColorEx(p_信息窗口,0.9) = 1 Then
         TracePrint "p_信息"
         If a = 0 Then 
             TracePrint  "直接关闭信息"
@@ -892,4 +927,25 @@ Function 调整地图
         Swipe xx,yy, xx, yy-300, 200  '下移动
         Delay 1000
     End Select
+End Function
+
+
+
+////////////////////////////////
+
+Function tap1(a, b, dt)
+
+    a = a + dx
+    b = b + dy
+    TracePrint a,b 
+End Function
+//
+Function Settap(a, b, c, d)
+    dx = rnd0(a,b)
+    dy = rnd0(c,d)	
+    TracePrint dx,dy
+End Function
+//
+Function rnd0(n,m)
+    rnd0=int((m-n+1)*rnd()+n)
 End Function
