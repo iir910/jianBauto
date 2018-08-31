@@ -48,6 +48,8 @@ Dim dx,dy //指定的坐标偏移量
 Dim tap参数={"min_x":-30,"max_x":3, "min_y":-30,"max_y":2, "t0":10,"t1":30} '设置点击的坐标偏移和按下时间
 //////////////// 读取设置 //////////////
 //
+//CmpColorEx(s_委托红点, 0.95)
+
 //For 3
 //	tap2 100, 200, 300,400,100
 //	
@@ -239,7 +241,7 @@ Function 收资源
     End If
 End Function
 Function 收委托
-    If ReadUIConfig("收委托奖励") and CmpColorEx(s_委托红点, 0.95) Then 
+    If ReadUIConfig("收委托奖励") and CmpColorEx(s_委托红点, 0.95)=1 Then 
         TracePrint "收委托奖励"
         tap2 4,332,28,454,1000 '点左侧栏
         While  fc(s_委托完成, 0.9, 2500, 0) 
