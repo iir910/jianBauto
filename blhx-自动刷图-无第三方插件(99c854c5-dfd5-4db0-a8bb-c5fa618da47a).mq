@@ -1,15 +1,13 @@
 //碧蓝航线
 Randomize
-//--------------------------------------
-//--定义变量
-//Dim ret
+//--定义变量--------------------------------------
 Dim intx,inty
 Dim dt '延时
 Dim i=0
-dim t = 0
-dim h= Int(t/3600)
-dim m= int((t-h*3600)/60)
-dim s= t-h*3600-m*60 
+//dim t = 0
+//dim h= Int(t/3600)
+//dim m= int((t-h*3600)/60)
+//dim s= t-h*3600-m*60 
 //Dim 坐标(10,2) '二维数组
 //Dim arr()
 Dim 是否退役,退役颜色 
@@ -20,7 +18,7 @@ dim 战斗次数=0
 Dim 索敌结果
 Dim 索敌失败次数
 dim 划图方向=0
-//Dim 首页(),章节(),选择舰队,战斗中
+////////////////////////
 dim p_首页 = "812|362|F7DF18,799|379|F7A610,777|425|523408,1011|361|42EBFF,1007|391|10A6E7,980|424|00387B"
 dim p_章节 = "740|676|EFC7A5,764|680|8C6952,942|617|949E7B,972|617|B59694,1144|627|DEEFFF,1173|639|2120FF"
 //dim 选择舰队 = ""
@@ -36,7 +34,7 @@ Dim p_遇到伏击="1008|405|CECFCE,718|403|10AEFF,399|460|18714A,161|391|1069A5,112
 Dim p_获得道具="513|141|63AEF7,776|141|63B6F7,775|182|319AF7,658|187|31DBFF,606|194|31CBFF,559|190|31AAF7"
 Dim p_黑屏="49|112|101410-000080,275|102|101410,678|125|101410,1138|112|101410,45|560|101410,388|560|101410,728|532|101410,1108|496|101410,1214|328|101410,995|221|101410"
 Dim p_信息窗口="926|188|42D7FF,959|189|ADAAAD,658|173|F7F3EF,672|206|DEDFDE,496|201|000000,308|166|F7F3EF,344|198|10BEFF"
-dim P_任务="47|23|42D7FF,122|16|C6F7FF,120|33|00BAFF,139|13|D6F7FF,137|29|10BAFF,280|32|000000,182|13|D6F3FF,400|42|949694,120|39|080808"
+dim P_任务="45|23|42DBFF,286|34|000000,184|13|D6F7FF,136|32|10BAFF,530|33|DEDFDE,100|67|635D5A,15|60|5A5952"
 //Dim p_剧情对白="1260|599|846152,1251|623|8C6552,1126|620|8C614A,21|617|8C6552,47|581|A58E7B,1205|660|F7F7F7"
 Dim s_委托红点="29|343|FFFFFF,23|338|2100EF,35|335|3110EF,35|341|1000DE,10|336|EFEFEF"
 dim s_委托完成="296|262|8CEFFF,299|313|A59694,293|297|949E7B,310|294|FFFFFF" '萤火虫
@@ -48,12 +46,6 @@ Dim dx,dy //指定的坐标偏移量
 Dim tap参数={"min_x":-30,"max_x":3, "min_y":-30,"max_y":2, "t0":10,"t1":30} '设置点击的坐标偏移和按下时间
 //////////////// 读取设置 //////////////
 //
-//CmpColorEx(s_委托红点, 0.95)
-
-//For 3
-//	tap2 100, 200, 300,400,100
-//	
-//Next
 是否退役 = ReadUIConfig("退役否")
 If 是否退役 Then 
     Select Case ReadUIConfig("退役的颜色")
@@ -105,43 +97,13 @@ TracePrint "////////////////////////收委托=" , ReadUIConfig("收委托奖励")
 TracePrint "////////////////////////收资源=" , ReadUIConfig ("收资金和石油")
 TracePrint "////////////////////////收任务=" , ReadUIConfig("收任务奖励") 
 ///////////////////////子线程///////////////////
-Thread.Start 跳过剧情  
+Thread.Start 跳过剧情
+Thread.Start 紧急委托
 //////////////////主线程////////////////////////
-Dim 界面图组()
 Do
-    界面图组 = Array(p_首页, p_章节,p_战斗中,p_map,p_出击编队,p_战斗结束,p_遇到伏击,p_获得道具, p_黑屏,P_任务)  '可自由添加 界面
-    Do
-        KeepCapture
-        i=0
-        For Each 颜色数据 In 界面图组
-            If CmpColorEx(颜色数据, 0.9) = 1 Then 
-                TracePrint "///////////界面图组.已识别 = 界面图组("&i&")"
-                Exit For
-            Else 
-                TracePrint "///////////界面图组("&i&") 没找到!"
-                If i < UBOUND(界面图组) Then 
-                    i = i + 1
-                Else 
-                    i=-1
-                End If
-            End If
-            Delay 50
-        Next
-        //
-        If i <> -1 Then 
-            ReleaseCapture
-            Exit Do
-        Else 
-            //预留此处,作统计"找图失败次数"用
-            //
-        End If
-        // 第?遍
-        TracePrint  "///////////////"
-        Delay 50
-        ReleaseCapture
-    Loop '此循环判断,当前处于哪张图,返回的序号为i ,没找到返回 i=-1
-    TracePrint "--------------------------返回的图序号=",i
-    Select Case i
+    Dim 界面图组 = Array(p_首页, p_章节,p_战斗中,p_map,p_出击编队,p_战斗结束,p_遇到伏击,p_获得道具, p_黑屏,P_任务)  '可自由添加 界面
+    dim 序号=  fcs(界面图组, 0.9, 2500) '返回的序号i ,没找到返回 i=-1
+    Select Case 序号
     Case 0
         TracePrint "在首页"
         首页
@@ -195,10 +157,10 @@ Do
     Case 9 
         TracePrint "P_任务 "
         收任务
-    Case Else
-        TracePrint "什么都没有找到!无法确认当前处于哪个界面"
+    Case -1
+        TracePrint "///////////////////////什么都没有找到!无法确认当前处于哪个界面"
     End Select  
-    Delay rnd_(200,450) '随机延时200~450
+    Delay 1500
 Loop
 //////////////游戏功能函数 模块////////////
 Function 首页
@@ -457,7 +419,7 @@ Function 舰队选择
         //船坞满了? 退役?
         If 是否退役 Then 
             tap1 571,518,500
-            整理卡片 
+            退役舰娘 
         Else //不退役
             TracePrint "船坞满了,不整理, 结束脚本!"
             EndScript
@@ -511,7 +473,7 @@ Function 索敌顺序(名称)
     Delay 200
 End Function
 Function 索敌_小型
-    ShowMessage "索敌_小型",1000,1000,650
+    ShowMessage "索敌_小型",1000,700,650
     FindMultiColor 124,173,1240,632, "10BADE","5|0|10BADE,10|0|10BADE,15|0|10AACE", 0, 0.95, intx, inty
     If intx > -1 Then 
         TracePrint "找到小型",intx&","&inty
@@ -522,7 +484,7 @@ Function 索敌_小型
     End If
 End Function
 Function 索敌_中型
-    ShowMessage "索敌_中型",1000,1000,650
+    ShowMessage "索敌_中型",1000,700,650
     FindMultiColor 124,173,1240,632, "00A6EF","5|0|00A6EF,10|0|00A6EF,15|0|00A6EF", 0, 0.95, intx, inty
     If intx > -1 Then 
         TracePrint "找到中型",intx&","&inty
@@ -533,7 +495,7 @@ Function 索敌_中型
     End If
 End Function
 Function 索敌_大型
-    ShowMessage "索敌_大型",1000,1000,650
+    ShowMessage "索敌_大型",1000,700,650
     FindMultiColor 124,173,1240,632, "0034BD","5|0|0034BD,10|0|0034BD,15|0|0034BD", 0, 0.95, intx, inty
     If intx > -1 Then 
         TracePrint "找到大型",intx&","&inty
@@ -544,7 +506,7 @@ Function 索敌_大型
     End If
 End Function
 Function 索敌_boss
-    ShowMessage "索敌_boss",1000,1000,650
+    ShowMessage "索敌_boss",1000,700,650
     FindMultiColor 124,173,1240,632, "524DFF","0|-2|524DFF,-3|-1|524DFF,11|-4|292439,14|-7|292439", 0, 0.95, intx, inty
     If intx > -1 Then 
         TracePrint "找到boss!!坐标 : ",intx&","&inty
@@ -628,34 +590,31 @@ Function 出击编队
         End If
     End If
     tap1 1159,669 ,500  '点击[出击]
-    If CmpColorEx("571|516|10AEFF,579|472|003894,419|478|4ADBFF,410|515|10AEFF,546|491|39CBFF", 0.95) = 1 Then 
-        //船坞满了? 退役?
+    dim 信息窗口= CmpColorEx("571|516|10AEFF,579|472|003894,419|478|4ADBFF,410|515|10AEFF,546|491|39CBFF", 0.95)
+    If  信息窗口= 1 Then 
         If 是否退役 Then 
+            //船坞满了,退役
             tap1 571,518,500
-            整理卡片 
+            退役舰娘 
             tap1 1159,669 ,500  '再次点击[出击]
             Delay 4000 
         Else //不退役
             TracePrint "船坞满了,不整理, 结束脚本!"
             EndScript
         End If
-    Else  '没有满, 进入战斗
-        Delay 4000 
     End If
 End Function
 //
-Function 整理卡片
-    TracePrint "//////////////f(整理卡片)"
-    dim tap参数={"min_x":-30,"max_x":3, "min_y":-30,"max_y":2, "t0":10,"t1":30}
-    'tap1 394, 462, 588, 527, 2000  
-    Delay 500
-    tap1 1242, 53, 2000 '打开{筛选界面}
+Function 退役舰娘
+    TracePrint "//////////////{退役舰娘}"
+    Dim dt
+    dim tap参数={"min_x":-20,"max_x":0, "min_y":-20,"max_y":2, "t0":10,"t1":30}
+    tap1 1242, 53, 2000 '打开 筛选 
     tap1 370,100, 300 '[排序]
     tap1 370,270, 300 '[索引]
     tap1 370,430, 300 '[阵营]
     tap1 370,590, 300 '[稀有度]
-    tap1 845,680, 1000 '点[确定]. 关闭{筛选界面}
-    Dim dt
+    tap1 845,680, 1000 '点[确定]. 关闭 筛选 
     Rem 退役
     If CmpColor(930, 28, "FFFFFF", 0.95) > -1 Then '检查[排序按钮]颜色.白色?
         TracePrint "//////////当前排序: 升序"
@@ -663,14 +622,15 @@ Function 整理卡片
         TracePrint "//////////修改排序为: 升序"
         tap1 1024, 56, 800        
     End If
+    tap参数={"min_x":-100,"max_x":0, "min_y":-40,"max_y":50, "t0":10,"t1":30}
     Dim k=0
     For i = 0 To 6
         If CmpColor(183+170*i, 256,  退役颜色,0.95) > -1 Then '检查 1-7 卡片色
-            dt =   rnd_(50, 200)
+            dt =   rnd_(100, 500)
             tap1 183 + 170 * i, 256, dt
-            信息(0)
             k=k+1
         Else 
+            TracePrint   "位置"&i+1&"不符合"
             ShowMessage "位置"&i+1&"不符合"
         End If 
     Next    
@@ -678,17 +638,19 @@ Function 整理卡片
         If CmpColor(183+170*i, 487,退役颜色,0.95) > -1 Then '检查 8-10 卡片色
             dt =   rnd_(50, 200)
             tap1 183 + 170 * i, 487, dt
-            信息(0)
             k=k+1
         Else 
-            ShowMessage "位置"&i+8&"不符合"
+            TracePrint   "位置"&i+8&"不符合"
+            ShowMessage  "位置"&i+8&"不符合"
         End If 
     Next
+    Delay 1000
     TracePrint "合计k =",k
     If k = 0 Then 
         TracePrint "没有空位...请检查船坞"	
         EndScript
     End If
+    tap参数={"min_x":-20,"max_x":0, "min_y":-20,"max_y":2, "t0":10,"t1":30}
     tap1 1200,700, 1000 '确定
     tap1 1100, 650, 1000 '确定
     tap1 1034, 640, 1000   '获得道具
@@ -800,6 +762,7 @@ Function 获得道具
 End Function
 //
 Function 信息(a)
+    // 分类
     If CmpColorEx(p_信息窗口,0.9) = 1 Then
         TracePrint "p_信息"
         If a = 0 Then 
@@ -884,8 +847,8 @@ Function 跳过剧情
             TracePrint "自动跳过剧情"
             ShowMessage "自动跳过剧情"
             Dim 范围=array(40,586,1177,710) '在指定的坐标范围,随机点击
-            Dim x=rnd_(范围(1),范围(3))
-            Dim y=rnd_(范围(2),范围(4))
+            Dim x=rnd_(范围(0),范围(2))
+            Dim y=rnd_(范围(1),范围(3))
             TouchDown x,y
             Delay rnd_(10,30)
             TouchUp
@@ -901,10 +864,12 @@ Function 紧急委托
         If CmpColorEx("726|517|18B2FF,728|472|003894,926|189|42D7FF,963|188|ADAAAD,309|167|F7F3F7",0.9) = 1 Then
             TracePrint "信息:紧急委托,关闭"
             ShowMessage "信息:紧急委托,关闭"
-            Dim 坐标=array(705,520) '坐标随机偏移
-            坐标(1)=rnd_(-170,5)
-            坐标(2)=rnd_(-40,5)
-            TouchDown 坐标(1),坐标(2)
+            Dim 坐标=array(710,516) '坐标随机偏移
+            // TracePrint 坐标(0),坐标(1)
+            dim x = 坐标(0)+rnd_(-80,5)
+            dim y = 坐标(1)+rnd_(-30,0)
+            TracePrint 坐标(0),坐标(1)
+            TouchDown x,y
             Delay rnd_(10,30)
             TouchUp
         End If
@@ -982,20 +947,24 @@ End Function //在限定的时间内,多点找色,可选择是否点击(颜色的第一点)
 //
 Function fcs(数组, 相似度, 超时)
     dim t0=TickCount()
-    Dim i=0
     Do
+        Dim i=0
+        KeepCapture
         For Each k In 数组
             If CmpColorEx(k, 相似度)=1 Then 
                 TracePrint "{fcs}, i=",i
                 fcs = i
-                Exit Do
+                ReleaseCapture
+                exit Function
             Else 
                 fcs=-1
                 i = i + 1
             End If
+            Delay 50
         Next
+        ReleaseCapture	
         Delay 100
-        dim t1=TickCount()		
+        dim t1=TickCount()
     Loop While t1 - t0 < 超时
     TracePrint "{fcs},超时"
 End Function  //在限定的时间内,分组多点找色,找到就输出数组序号,没找到就输出-1
