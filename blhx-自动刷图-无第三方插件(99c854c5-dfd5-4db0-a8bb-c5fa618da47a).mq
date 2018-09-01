@@ -41,7 +41,7 @@ dim s_委托完成="296|262|8CEFFF,299|313|A59694,293|297|949E7B,310|294|FFFFFF" '萤
 Dim s_任务栏红点="927|674|1800EF,939|675|1800E7,933|679|FFFFFF,933|668|FFFFFF,928|677|1800E7"
 Dim s_奖励红点="1195|108|FFFFFF,1074|119|39CFFF,1199|104|1800EF,1189|140|10AAFF"
 //
-Dim dx,dy //指定的坐标偏移量
+//Dim dx,dy //指定的坐标偏移量
 /////////////////////////////////
 Dim tap参数={"min_x":-30,"max_x":3, "min_y":-30,"max_y":2, "t0":10,"t1":30} '设置点击的坐标偏移和按下时间
 //////////////// 读取设置 //////////////
@@ -102,7 +102,7 @@ Thread.Start 紧急委托
 //////////////////主线程////////////////////////
 Do
     Dim 界面图组 = Array(p_首页, p_章节,p_战斗中,p_map,p_出击编队,p_战斗结束,p_遇到伏击,p_获得道具, p_黑屏,P_任务)  '可自由添加 界面
-    dim 序号=  fcs(界面图组, 0.9, 2500) '返回的序号i ,没找到返回 i=-1
+    dim 序号=  scex(界面图组, 0.9, 2500) '返回的序号i ,没找到返回 i=-1
     Select Case 序号
     Case 0
         TracePrint "在首页"
@@ -206,13 +206,16 @@ Function 收委托
     If ReadUIConfig("收委托奖励") and CmpColorEx(s_委托红点, 0.95)=1 Then 
         TracePrint "收委托奖励"
         tap2 4,332,28,454,1000 '点左侧栏
-        While  fc(s_委托完成, 0.9, 2500, 0) 
+        While  sc(s_委托完成, 0.9, 2500) 
             TracePrint "收委托"
             ShowMessage "收委托"
             tap1 490,310, 1000 '点[完成]
-            ShowMessage "确认经验"
+            //ShowMessage "确认经验"
+            dim 委托成功="317|92|3986EF,118|69|5AFBFF,1200|352|0065A5,475|51|52EFFF,235|85|10205A,483|51|081C52,202|45|081852,39|336|106DAD"
+            Dim 获得
             tap1 269,244, 1000 '经验
-            fc(p_获得道具,0.9,2500,1)
+            // 可能获得道具,可能没有
+            sc(p_获得道具,0.9,2500)
             //判断获得舰娘
         Wend
         tap2 554,242,725,589,1000 '关闭侧边栏
@@ -696,7 +699,7 @@ Function 战斗结束
     tap1 635,647,1000  '获得道具
     //
     Dim 数组=Array(p_结算完毕,p_获得舰娘)
-    dim 结果=  fcs(数组, 0.9, 4000)
+    dim 结果=  scEX(数组, 0.9, 4000)
     If 结果 = 0 Then 
         '找确认按钮
         tap1 1193, 634, 2000
@@ -715,9 +718,9 @@ End Function
 //
 Function 判断获得舰娘
     //获得卡片?
-    If fc(p_获得舰娘, 0.9, 5000, 0) Then 
+    If sc(p_获得舰娘, 0.9, 5000) Then 
         TracePrint "获得 舰娘"
-        If fc(p_新舰娘, 0.9, 2100, 0) Then 
+        If sc(p_新舰娘, 0.9, 2100) Then 
             TracePrint "获得 新舰娘"
             dim 日期= DateTime.Format("%Y-%m-%d %H.%M.%S")
             Delay 100
@@ -802,6 +805,8 @@ Function 检查心情
                 EndScript '结束脚本
             End If
             Exit For
+        Else 
+            TracePrint "心情可以,继续..."
         End If
     Next
 End Function
@@ -849,8 +854,9 @@ Function 跳过剧情
             Dim 范围=array(40,586,1177,710) '在指定的坐标范围,随机点击
             Dim x=rnd_(范围(0),范围(2))
             Dim y=rnd_(范围(1),范围(3))
+            Dim dt=rnd_(10,30)
             TouchDown x,y
-            Delay rnd_(10,30)
+            Delay dt
             TouchUp
         End If
         //ReleaseCapture
@@ -868,9 +874,10 @@ Function 紧急委托
             // TracePrint 坐标(0),坐标(1)
             dim x = 坐标(0)+rnd_(-80,5)
             dim y = 坐标(1)+rnd_(-30,0)
+            Dim dt=rnd_(10,30)
             TracePrint 坐标(0),坐标(1)
             TouchDown x,y
-            Delay rnd_(10,30)
+            Delay dt 
             TouchUp
         End If
         Delay 2000
@@ -898,19 +905,21 @@ End Function   '产生一个(n~m)范围内的随机整数
 Function tap1(x, y, dt)
     x = x + rnd_(tap参数["min_x"], tap参数["max_x"])
     y = y + rnd_(tap参数["min_y"], tap参数["max_y"])
+    Dim t= rnd_(tap参数["t0"], tap参数["t1"])
     TracePrint "{tap1}...点击的坐标=",x,",",y,"	点击后延时=",dt,"(毫秒)"
     TouchDown x, y	
-    Delay   rnd_(tap参数["t0"], tap参数["t1"])
+    Delay  t 
     TouchUp  
     Delay dt
 End Function  '该函数:  点击坐标(x,y),带随机偏移,偏移范围在表{tap参数}键值里设置
 //
 Function tap2(x, y,x0,y0, dt)
     x = rnd_(x,x0)
-    y = rnd_(y,y0)
+    y = rnd_(y, y0)
+     Dim t= rnd_(tap参数["t0"], tap参数["t1"])
     TracePrint "{tap2}...坐标范围x=(" ,x& "~" ,x0, ") | 坐标范围y=(" ,y, "~" ,y0, ")"	
     TouchDown x, y
-    Delay rnd_(tap参数["t0"], tap参数["t1"])
+    Delay t
     TouchUp  
     Delay dt
 End Function '该函数:  在指定范围内,随机点击一个坐标. x范围(x,xx),y的范围(y,yy)
@@ -923,48 +932,85 @@ Function OnScriptExit()
     TracePrint "///////////////////////脚本运行时间 =",h&"时",m&"分",s&"秒"
 End Function  //这里面写脚本停止时想自动运行的代码 
 //
-Function fc(颜色,相似度,超时,点击)
+Function sc(颜色值,精度,限时)
     dim t0=TickCount()
     Do 
-        Dim t1=TickCount()	
-        If CmpColorEx(颜色, 相似度) = 1 Then 
-            fc = true
-            If 点击=1 Then 
-                dim arr()=Split( 颜色, "|")
-                TracePrint "{fc}成功找到,耗时="&TickCount()-t0 &"毫秒.  点击坐标:" &arr(0)&","&arr(1)  
-                tap1 arr(0), arr(1), 100
-                Exit Function
-            Else 
-                TracePrint "{fc}成功找到,   耗时", TickCount()-t0
-                Exit Function
-            End If
+        If CmpColorEx(颜色值, 精度) = 1 Then 
+            sc = true
+            TracePrint "{sc}找色,成功,   耗时", TickCount()-t0,"毫秒"
+            Exit Function
         End If
-        Delay 200  '每个200ms搜一次
-    Loop While t1 - t0 <= 超时
-    fc=false
-    TracePrint "失败,{fc}超时"
-End Function //在限定的时间内,多点找色,可选择是否点击(颜色的第一点)
+        Delay 150   
+    Loop While TickCount() - t0 <= 限时
+    sc=false
+    TracePrint "{sc}找色,失败, 超时",限时,"毫秒"
+End Function '在限时内,寻找指定点的颜色值,找到返回true,否则返回false	
 //
-Function fcs(数组, 相似度, 超时)
-    dim t0=TickCount()
+Function scEX(颜色值, 精度, 限时)
+    If IsArray(颜色值) <> true Then 
+        TracePrint 	"{scEX}   错误!!颜色值 必须是数组类型!"
+        Exit Function
+    End If
+    dim t0=TickCount() 
     Do
-        Dim i=0
-        KeepCapture
-        For Each k In 数组
-            If CmpColorEx(k, 相似度)=1 Then 
-                TracePrint "{fcs}, i=",i
-                fcs = i
-                ReleaseCapture
-                exit Function
-            Else 
-                fcs=-1
-                i = i + 1
+        For i = 0 To UBOUND(颜色值)
+            If CmpColorEx(颜色值(i), 精度) = 1 Then 
+                TracePrint "{scEX}多组找色,成功, i="&i ,"耗时", TickCount()-t0,"毫秒"
+                scEX = i
+                Exit Function 
             End If
             Delay 50
         Next
-        ReleaseCapture	
-        Delay 100
-        dim t1=TickCount()
-    Loop While t1 - t0 < 超时
-    TracePrint "{fcs},超时"
-End Function  //在限定的时间内,分组多点找色,找到就输出数组序号,没找到就输出-1
+        Delay 150 
+    Loop While TickCount() - t0 < 限时
+    scEX = -1
+    TracePrint "{scEX}多组找色,失败, 超时",限时,"毫秒"
+End Function  '限时内,寻找指定点的颜色值组(数组),找到返回i(序号),否则返回-1
+//
+Function scm(颜色值, 精度, 限时)
+    dim t0=TickCount()
+    Do
+        For i = 0 To UBOUND(颜色值)
+            If CmpColorEx(颜色值(i), 精度) = 1 Then 
+                Exit Do 
+            End If
+        Next
+        Delay 150   
+    Loop While TickCount() - t0 <= 限时
+    Do While TickCount() - t0 <= 限时
+        If CmpColorEx(颜色值, 精度) = 0 Then 
+            scm = true
+            TracePrint "{scm}找色,出现后又消失,   耗时", TickCount()-t0,"毫秒"
+            Exit Function
+        End If
+        Delay 75	
+    Loop 
+    scm = False 
+    TracePrint "{scm}找色,失败, 超时",限时,"毫秒"
+End Function '在限定时间内,指定点的颜色值组,出现后又消失.,返回true,否则返回false	
+//
+Function scmEX(颜色值, 精度, 限时)
+    If IsArray(颜色值) <> true Then 
+        TracePrint 	"{scmEX}   错误!!颜色值 必须是数组类型!"
+        Exit Function
+    End If
+    dim t0=TickCount()
+    Do
+        For i = 0 To UBOUND(颜色值)
+            If CmpColorEx(颜色值(i), 精度) = 1 Then 	
+                Exit Do 
+            End If
+        next
+        Delay 150   
+    Loop While TickCount() - t0 <= 限时
+    Do While TickCount() - t0 <= 限时
+        If CmpColorEx(颜色值(i), 精度) = 0 Then 
+            scmEX = true
+            TracePrint "{scmEX}多组找色,出现后又消失,   耗时", TickCount()-t0,"毫秒"
+            Exit Function
+        End If
+        Delay 75	
+    Loop 
+    scmEX = false
+    TracePrint "{scmEx}多组找色,失败, 超时",限时,"毫秒"
+End Function '在限定时间内定点的颜色值组(数组),,出现后又消失.返回i(序号),否则返回-1
