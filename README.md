@@ -9,6 +9,7 @@ jianBauto = 舰B auto
     dpi 240
 
     开发中,目前未完成。
+    bug是必须存在的!
 
 ----
 
