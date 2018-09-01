@@ -35,7 +35,7 @@ Dim p_获得道具="513|141|63AEF7,776|141|63B6F7,775|182|319AF7,658|187|31DBFF,606|
 Dim p_黑屏="49|112|101410-000080,275|102|101410,678|125|101410,1138|112|101410,45|560|101410,388|560|101410,728|532|101410,1108|496|101410,1214|328|101410,995|221|101410"
 Dim p_信息窗口="926|188|42D7FF,959|189|ADAAAD,658|173|F7F3EF,672|206|DEDFDE,496|201|000000,308|166|F7F3EF,344|198|10BEFF"
 dim P_任务="45|23|42DBFF,286|34|000000,184|13|D6F7FF,136|32|10BAFF,530|33|DEDFDE,100|67|635D5A,15|60|5A5952"
-//Dim p_剧情对白="1260|599|846152,1251|623|8C6552,1126|620|8C614A,21|617|8C6552,47|581|A58E7B,1205|660|F7F7F7"
+//
 Dim s_委托红点="29|343|FFFFFF,23|338|2100EF,35|335|3110EF,35|341|1000DE,10|336|EFEFEF"
 dim s_委托完成="296|262|8CEFFF,299|313|A59694,293|297|949E7B,310|294|FFFFFF" '萤火虫
 Dim s_任务栏红点="927|674|1800EF,939|675|1800E7,933|679|FFFFFF,933|668|FFFFFF,928|677|1800E7"
@@ -92,7 +92,6 @@ TracePrint "////////////////////////模式="&模式
 //
 获得新船时截图 = ReadUIConfig("获得新船时截图")
 TracePrint "////////////////////////获得新船截图 =",获得新船时截图
-//
 TracePrint "////////////////////////收委托=" , ReadUIConfig("收委托奖励")
 TracePrint "////////////////////////收资源=" , ReadUIConfig ("收资金和石油")
 TracePrint "////////////////////////收任务=" , ReadUIConfig("收任务奖励") 
@@ -165,11 +164,15 @@ Loop
 //////////////游戏功能函数 模块////////////
 Function 首页
     TracePrint "{首页}"
-    收资源 
-    收委托 
+    If ReadUIConfig("收资金和石油") Then 
+        收资源 
+    End If
+    If ReadUIConfig("收委托奖励") and CmpColorEx(s_委托红点, 0.95) = 1 Then 
+        收委托 
+    End If
     If ReadUIConfig("收任务奖励") and CmpColorEx(s_任务栏红点, 0.9) = 1 Then 
-        TracePrint "/////////////////////有任务奖励,打开"
-        tap1  928, 701,1500
+        //        TracePrint "/////////////////////有任务奖励,打开"
+       tap1  928, 701,1500
         收任务
     End If
     Select Case 模式
@@ -204,26 +207,38 @@ Function 收资源
 End Function
 Function 收委托
     If ReadUIConfig("收委托奖励") and CmpColorEx(s_委托红点, 0.95)=1 Then 
-        TracePrint "收委托奖励"
         tap2 4,332,28,454,1000 '点左侧栏
-        While  sc(s_委托完成, 0.9, 2500) 
+        While  sc(s_委托完成, 0.9, 1500) 
             TracePrint "收委托"
             ShowMessage "收委托"
             tap1 490,310, 1000 '点[完成]
             //ShowMessage "确认经验"
-            dim 委托成功="317|92|3986EF,118|69|5AFBFF,1200|352|0065A5,475|51|52EFFF,235|85|10205A,483|51|081C52,202|45|081852,39|336|106DAD"
-            Dim 获得
-            tap1 269,244, 1000 '经验
-            // 可能获得道具,可能没有
-            sc(p_获得道具,0.9,2500)
-            //判断获得舰娘
-        Wend
+            tap1 269, 244, 50
+            tap1 269,244, 1000 '连点 加速结算
+            Dim p_左侧栏="45|153|63718C,9|157|945939,294|169|3138BD,313|215|BD6152,211|200|424542,506|647|7B757B,84|146|6B9A63"
+            Dim 组=Array(p_获得道具,p_左侧栏)
+            Select Case scEX(组, 0.9, 2000)
+            Case 0
+                TracePrint "获得道具"
+                 tap1 700, 600, 1000
+                //预留此处
+                //判断获得舰娘
+            Case 1
+                TracePrint "没有获得道具"
+            Case -1
+                TracePrint "啥jb都没有"
+            End Select
+        wend
         tap2 554,242,725,589,1000 '关闭侧边栏
+        TracePrint "收委托奖励"
+        ShowMessage "收委托奖励"
+    Else 
+        TracePrint "忽略 收委托"
     End If
 End Function
 Function 收任务
     //循环,检查红点
-    Do While CmpColorEx(s_奖励红点, 0.9) = 1
+    Do While sc(s_奖励红点, 0.9,1200) = 1
         TracePrint "收任务玩成奖励"
         Delay 500
         tap2 1062,103,1196,145,1000 '点击红点
@@ -232,6 +247,7 @@ Function 收任务
         //判断获得舰娘
         //处理
     Loop
+    TracePrint "没有已经完成的任务,返回"
     tap1 66,31,1000 '返回主页
 End Function
 //
@@ -906,7 +922,7 @@ Function tap1(x, y, dt)
     x = x + rnd_(tap参数["min_x"], tap参数["max_x"])
     y = y + rnd_(tap参数["min_y"], tap参数["max_y"])
     Dim t= rnd_(tap参数["t0"], tap参数["t1"])
-    TracePrint "{tap1}...点击的坐标=",x,",",y,"	点击后延时=",dt,"(毫秒)"
+    TracePrint "{tap1}...点击的坐标=",x,",",y,"	点击后延时=",dt,"毫秒"
     TouchDown x, y	
     Delay  t 
     TouchUp  
@@ -916,7 +932,7 @@ End Function  '该函数:  点击坐标(x,y),带随机偏移,偏移范围在表{tap参数}键值里设置
 Function tap2(x, y,x0,y0, dt)
     x = rnd_(x,x0)
     y = rnd_(y, y0)
-     Dim t= rnd_(tap参数["t0"], tap参数["t1"])
+    Dim t= rnd_(tap参数["t0"], tap参数["t1"])
     TracePrint "{tap2}...坐标范围x=(" ,x& "~" ,x0, ") | 坐标范围y=(" ,y, "~" ,y0, ")"	
     TouchDown x, y
     Delay t
@@ -1005,12 +1021,12 @@ Function scmEX(颜色值, 精度, 限时)
     Loop While TickCount() - t0 <= 限时
     Do While TickCount() - t0 <= 限时
         If CmpColorEx(颜色值(i), 精度) = 0 Then 
-            scmEX = true
+            scmEX = i
             TracePrint "{scmEX}多组找色,出现后又消失,   耗时", TickCount()-t0,"毫秒"
             Exit Function
         End If
         Delay 75	
     Loop 
-    scmEX = false
+    scmEX = -1
     TracePrint "{scmEx}多组找色,失败, 超时",限时,"毫秒"
 End Function '在限定时间内定点的颜色值组(数组),,出现后又消失.返回i(序号),否则返回-1
