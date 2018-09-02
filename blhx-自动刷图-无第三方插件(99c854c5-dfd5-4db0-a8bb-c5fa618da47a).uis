@@ -33,3 +33,9 @@ End Function
 Function boss切队2
     UIP.SetAttribute "boss切队1", {"选中":false}
 End Function
+//
+//Function 出1
+//    //If UIP.GetAttribute("出击的队伍2") = UIP.GetAttribute("出击的队伍1") Then 
+//    UIP.SetAttribute "出击的队伍2",{"选项": 2}
+//    // End If
+//End Function
