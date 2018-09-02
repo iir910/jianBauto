@@ -100,7 +100,19 @@ dim 出击的队伍1=ReadUIConfig("出击的队伍1")
 TracePrint "////////////////////////出击的队伍1=",出击的队伍1
 dim 出击的队伍2=ReadUIConfig("出击的队伍2")
 TracePrint "////////////////////////出击的队伍2=",出击的队伍2
-//Dim "boss切队1"
+//Dim
+Dim boss队
+If ReadUIConfig("boss切队1") Then 
+    TracePrint "打boss,使用 出击的队伍"&出击的队伍1
+    boss队=出击的队伍1
+End If
+If ReadUIConfig("boss切队2") Then 
+    TracePrint "打boss,使用 出击的队伍"&出击的队伍2
+    boss队=出击的队伍2
+End If
+If boss队 = null Then 
+    TracePrint "////////////////////直接使用当前的队伍来打boss"
+End If
 ///////////////////////子线程///////////////////
 Thread.Start 跳过剧情
 Thread.Start 紧急委托
@@ -435,6 +447,26 @@ Function 从章节进入map
 End Function
 Function 舰队选择
     TracePrint "{舰队选择}"
+    //
+    Select Case 信息窗口()
+    Case 1
+        If 是否退役 Then   '船坞满了,退役
+            tap1 571,518,500
+            退役舰娘 
+            tap1  1139,644,1000 '立刻前往2
+            轮数 = 轮数 + 1
+            战斗次数=0
+        Else '不退役
+            TracePrint "船坞满了,不整理, 结束脚本!"
+            //或者,其他处理
+            EndScript
+        End If
+    Case 2
+        TracePrint "出现警告!!!!心情低!!!"
+        //预留处理
+        EndScript
+    Case -1
+    End Select
     Dim 位置1空缺="395|173|39517B"
     Dim 位置2空缺="395|307|39517B"
     If CmpColorEx(位置1空缺, 0.9) = 0 Then 
@@ -475,25 +507,6 @@ Function 舰队选择
     End If
     tap1  1139,644,1000 '立刻前往2
     //////////////////////////////////
-    Select Case 信息窗口()
-    Case 1
-        If 是否退役 Then   '船坞满了,退役
-            tap1 571,518,500
-            退役舰娘 
-            tap1  1139,644,1000 '立刻前往2
-            轮数 = 轮数 + 1
-            战斗次数=0
-        Else '不退役
-            TracePrint "船坞满了,不整理, 结束脚本!"
-            //或者,其他处理
-            EndScript
-        End If
-    Case 2
-        TracePrint "出现警告!!!!心情低!!!"
-        //预留处理
-        EndScript
-    Case -1
-    End Select
     //EndScript
     //
 End Function
@@ -610,44 +623,58 @@ End Function
 Function 索敌_boss
     ShowMessage "索敌_boss",1000,700,650
     FindMultiColor 124,173,1240,632, "524DFF","0|-2|524DFF,-3|-1|524DFF,11|-4|292439,14|-7|292439", 0, 0.95, intx, inty
-    If intx > -1 Then 
-        TracePrint "找到boss!!坐标 : ",intx&","&inty
-        //换队伍
-        Dim 舰队1 = "214|67|ADEBFF,207|68|ADEBFF,215|77|6BD7FF,215|97|00BAFF,210|88|21C3F7,219|78|424142"
-        //Dim 舰队2=
-        Dim 舰队3 ="205|89|18BEF7,214|99|00BAF7,220|90|18BEF7,214|62|ADD7E7,204|67|ADEBFF,223|71|A5EBFF,223|84|31C3F7,217|100|00BAF7,213|90|39384A"
-        //Dim 舰队4=
-        //Dim 舰队5=
-        //Dim 舰队6=
-        //ReadUIConfig   读取打boss的队伍
-        If  CmpColorEx(舰队1,0.90) = 1 Then
-            TracePrint "///////////////////当前是:第1舰队"
-            tap1 1009,682,2000 '切换
-        End If
-        //
-        If   CmpColorEx(舰队3,0.90) = 1 Then
-            TracePrint "///////////////////当前是:第3舰队"
-            Delay 1000
-            //移动
-        Else 
-            TracePrint "nnn"
-        End If
-        //切换队伍后,强制搜索boss
-        //dim sboss
-        FindMultiColor(124,173,1240,632, "524DFF","0|-2|524DFF,-3|-1|524DFF,11|-4|292439,14|-7|292439", 0, 0.95, intx, inty)
-        While intx = -1
-            调整地图 
-            Delay 1000
-            FindMultiColor(124,173,1240,632, "524DFF","0|-2|524DFF,-3|-1|524DFF,11|-4|292439,14|-7|292439", 0, 0.95, intx, inty)
-        Wend
-        TracePrint "强制,找到boss!!坐标 : ",intx&","&inty
-        //
-        移动 
-        ///////
-    Else 
+    If intx = -1 Then 
+        ShowMessage "索敌_boss,失败", 1000, 700, 650
+        TracePrint "索敌_boss,失败",1000,700,650
         索敌结果 = 0
         索敌失败次数=索敌失败次数+1
+        Exit Function
     End If
+    TracePrint "找到boss!!坐标 : ",intx&","&inty
+    If boss队 <> null Then 
+        //换队伍
+        Dim 舰队1 = "214|67|ADEBFF,207|68|ADEBFF,215|77|6BD7FF,215|97|00BAFF,210|88|21C3F7,219|78|424142"
+        Dim 舰队2=""
+        Dim 舰队3 ="205|89|18BEF7,214|99|00BAF7,220|90|18BEF7,214|62|ADD7E7,204|67|ADEBFF,223|71|A5EBFF,223|84|31C3F7,217|100|00BAF7,213|90|39384A"
+        Dim 舰队4=""
+        Dim 舰队5=""
+        Dim 舰队6=""
+        //ReadUIConfig   读取打boss的队伍
+        //找当前是第?队
+        Dim 数组=Array(舰队1,舰队2,舰队3,舰队4,舰队5,舰队6)
+        Dim 当前队伍=scEX(数组, 0.9, 2000)+1
+        If 当前队伍 = boss队 Then 
+            TracePrint "////////////////////boss队="&boss队,"    当前是:第"&当前队伍&"舰队, 无需切换"
+        Else 
+            TracePrint "////////////////////boss队="&boss队,"    当前是:第"&当前队伍&"舰队, 切换!!!!"
+            tap1 1009,682,2300 '切换
+        End If
+    End If
+    //       /// 
+    //        If  CmpColorEx(舰队1,0.90) = 1 Then
+    //            TracePrint "///////////////////当前是:第1舰队"
+    //            tap1 1009,682,2000 '切换
+    //        End If
+    //        //
+    //        If   CmpColorEx(舰队3,0.90) = 1 Then
+    //            TracePrint "///////////////////当前是:第3舰队"
+    //            Delay 1000
+    //            //移动
+    //        Else 
+    //            TracePrint "nnn"
+    //        End If
+    //切换队伍后,强制搜索boss
+    //dim sboss
+    FindMultiColor(124,173,1240,632, "524DFF","0|-2|524DFF,-3|-1|524DFF,11|-4|292439,14|-7|292439", 0, 0.95, intx, inty)
+    While intx = -1
+        调整地图 
+        Delay 1000
+        FindMultiColor(124,173,1240,632, "524DFF","0|-2|524DFF,-3|-1|524DFF,11|-4|292439,14|-7|292439", 0, 0.95, intx, inty)
+    Wend
+    TracePrint "强制,找到boss!!坐标 : ",intx&","&inty
+    //
+    移动 
+    ///////
 End Function
 //
 Function 移动
@@ -957,10 +984,12 @@ End Function
 Function 紧急委托 
     TracePrint "子线程{紧急委托}, 启动"
     Do
-        If 信息窗口() = 1 Then 
+        //中间有一个黄色按钮
+        If CmpColorEx("726|517|18B2FF,728|472|003894,926|189|42D7FF,963|188|ADAAAD,309|167|F7F3F7",0.9) = 1 Then
             TracePrint "信息:紧急委托,关闭"
             ShowMessage "信息:紧急委托,关闭"
             Dim 坐标=array(710,516) '坐标随机偏移
+            // TracePrint 坐标(0),坐标(1)
             dim x = 坐标(0)+rnd_(-80,5)
             dim y = 坐标(1)+rnd_(-30,0)
             Dim dt=rnd_(10,30)
@@ -970,22 +999,6 @@ Function 紧急委托
         End If
         Delay 2500
     Loop 
-    //    Do
-    //        //中间有一个黄色按钮
-    //        If CmpColorEx("726|517|18B2FF,728|472|003894,926|189|42D7FF,963|188|ADAAAD,309|167|F7F3F7",0.9) = 1 Then
-    //            TracePrint "信息:紧急委托,关闭"
-    //            ShowMessage "信息:紧急委托,关闭"
-    //            Dim 坐标=array(710,516) '坐标随机偏移
-    //            // TracePrint 坐标(0),坐标(1)
-    //            dim x = 坐标(0)+rnd_(-80,5)
-    //            dim y = 坐标(1)+rnd_(-30,0)
-    //            Dim dt=rnd_(10,30)
-    //            TouchDown x,y
-    //            Delay dt 
-    //            TouchUp
-    //        End If
-    //        Delay 2100
-    //    Loop 
 End Function
 ///////////////////////////////////////通用函数////////////////////////////
 Function rnd_(n, m)	
