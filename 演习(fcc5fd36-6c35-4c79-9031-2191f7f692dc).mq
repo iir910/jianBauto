@@ -1,0 +1,226 @@
+'模拟器参数: mumu 1280*720 240dpi 极速+ 渲染加速
+'===================
+Randomize //初始化,只需执行一次
+Dim tap参数={"min_x":-30,"max_x":3, "min_y":-30,"max_y":2, "t0":10,"t1":50} '设置点击的坐标偏移和按下时间
+'=============定义变量================
+'设置固定坐标x浮动范围[-10,15], 固定坐标y浮动范围[-5,20], 点击后默认延时2000毫秒
+dim p_首页 = "812|362|F7DF18,799|379|F7A610,777|425|523408,1011|361|42EBFF,1007|391|10A6E7,980|424|00387B"
+dim p_章节 = "740|676|EFC7A5,764|680|8C6952,942|617|949E7B,972|617|B59694,1144|627|DEEFFF,1173|639|2120FF"
+Dim p_map= "1007|664|424142,1227|683|103C6B,1107|648|1079DE,786|682|101063,775|667|080CCE" '底下3按钮图案
+dim p_战斗中 = "1251|64|E7E3E7,1228|66|DEDFE7,1240|52|313431,1222|48|313431,1228|26|DEDFE7,1209|45|DEDFE7"
+dim p_战斗结束 = "30|344|0869AD,104|338|0865A5,169|343|0865A5,1134|349|0865A5,1206|352|0865A5" '黄斜线的颜色
+dim p_战斗胜利 = "209|483|393C39,264|487|21C339,254|494|FFFFFF,250|477|39D352" '第一个绿勾和周围颜色
+dim p_结算完毕 = "857|600|DEDFDE,909|608|424142,1059|611|FFFFFF,1152|609|393C39" 
+Dim p_获得舰娘= "58|634|CECBCE,71|619|E7D342,1019|592|393839,55|442|CECBE7,1026|567|EFEFEF" '
+Dim p_新舰娘 = "313|87|3196F7,251|59|7BDFFF,300|41|7BBEFF,124|99|7BC3FF,165|82|10287B,176|119|10287B" 'new
+dim p_出击编队 = "1166|657|D6CF94,1035|612|B5617B,944|614|5A75EF,1123|598|F7F3D6,1143|644|5AAEF7" '出击2
+Dim p_遇到伏击="1008|405|CECFCE,718|403|10AEFF,399|460|18714A,161|391|1069A5,1128|392|1069A5"
+Dim p_获得道具="513|141|63AEF7,776|141|63B6F7,775|182|319AF7,658|187|31DBFF,606|194|31CBFF,559|190|31AAF7"
+Dim p_黑屏="49|112|101410-000080,275|102|101410,678|125|101410,1138|112|101410,45|560|101410,388|560|101410,728|532|101410,1108|496|101410,1214|328|101410,995|221|101410"
+Dim p_信息窗口="926|188|42D7FF,959|189|ADAAAD,658|173|F7F3EF,672|206|DEDFDE,496|201|000000,308|166|F7F3EF,344|198|10BEFF"
+dim P_任务="45|23|42DBFF,286|34|000000,184|13|D6F7FF,136|32|10BAFF,530|33|DEDFDE,100|67|635D5A,15|60|5A5952"
+Dim p_每日="233|653|C6E3FF,310|514|9CAEE7,168|235|C6DFFF,183|102|94BEF7,301|347|425DD6,70|30|DEDBDE,487|36|DEDFDE,163|397|73BEEF" 
+//
+Dim s_委托红点="29|343|FFFFFF,23|338|2100EF,35|335|3110EF,35|341|1000DE,10|336|EFEFEF"
+dim s_委托完成="296|262|8CEFFF,299|313|A59694,293|297|949E7B,310|294|FFFFFF" '萤火虫的颜色
+Dim s_任务栏红点="927|674|1800EF,939|675|1800E7,933|679|FFFFFF,933|668|FFFFFF,928|677|1800E7"
+Dim s_奖励红点="1195|108|FFFFFF,1074|119|39CFFF,1199|104|1800EF,1189|140|10AAFF"
+Dim s_上一章 ="74|370|CECFCE,62|355|E7E7E7,49|358|8C8E8C,70|339|B5B2B5"
+//
+dim p_演习="79|36|D6D3D6,44|23|42DBFF,172|21|6BDBF7,1219|389|6B5508,1224|357|DEAA00,180|557|63E3F7,189|561|6B96D6,183|507|31599C"
+dim p_win="35|342|0869AD,83|352|0869AD,159|355|0869AD,1141|350|0869AD,1204|347|0869AD,1263|361|0865AD,503|480|42D75A,514|489|18BA29,403|328|5AFBFF,503|494|FFFFFF"
+dim p_lose="27|332|0869AD,83|357|0869AD,1203|352|0869AD,1257|367|0865A5,495|485|3938DE,505|486|FFFFFF,54|376|0869AD,1195|359|0869AD"
+Dim p_结算="1043|622|BDBEC6,1150|606|525152,1184|616|B5BABD,1202|588|B5B6B5,1110|607|FFFFFF,976|588|B5B6B5,909|615|080808,29|348|0869AD,1148|333|0869AD"
+'========判断目前所在状态============================================
+Do
+    Dim arr=array(p_首页,p_章节,p_战斗中,p_演习,p_win,p_lose)
+    dim 序号=scex(arr,0.9,1500)
+    Select Case 序号
+    Case 0
+        TracePrint "主页"
+        首页
+    Case 1
+        TracePrint "章节"
+        章节
+    Case 2
+        TracePrint "战斗中"
+        战斗中
+    Case 3
+        TracePrint "演习"
+        演习
+    Case 4
+        TracePrint "win"
+        win
+    Case 5
+        TracePrint "lose"
+        lose
+    Case -1
+        TracePrint "啥jb都没有!!!!"
+    End Select
+    Delay 1500
+Loop
+//
+EndScript
+//////////////////////////////////////////////
+Function 首页
+    tap1 1167,419, 1500 '进入章节
+    章节
+End Function
+Function 章节
+    tap2 1124, 654, 1250, 694,1500 ' 进入演习
+    演习
+End Function
+Function 演习
+    TracePrint "p_演习"   
+    dim i = rnd_(0, 3)  '随机选一个对手
+    TracePrint i
+    // 109,145,245,359
+    tap2 109 + i * 247, 145, 245 + i * 247, 359,1500  '选择对手
+    tap2 965, 611, 1147, 675, 2000 '确认对手
+    tap2 939,594,1185,674,2000 '出击
+End Function
+function 战斗中
+    TracePrint "战斗中..."
+End Function
+Function win
+    tap1 600, 150, 1000  'win
+    TracePrint "获得功勋,点击"
+    tap2 (472,507,811,681,1500) '获得 ,点击一下
+    do Until sc(p_结算,0.9,4000)
+        Delay 1000
+    loop
+    TracePrint "获得经验,确认完毕"
+    tap2 (1025,581,1197,635,1500) '获得经验,确认完毕.
+End Function
+Function lose
+    //和 win 一致
+    tap1 600, 150, 1000  'win
+    TracePrint "获得功勋,点击"
+    tap2 (472,507,811,681,1500) '获得 ,点击一下
+    do Until sc(p_结算,0.9,4000)
+        Delay 1000
+    loop
+    TracePrint "获得经验,确认完毕"
+    tap2 (1025,581,1197,635,1500) '获得经验,确认完毕.
+End Function
+//////////////////////////////////////通用函数////////////////////////////
+Function rnd_(n, m)	
+    rnd_=int((m-n+1)*rnd()+n)
+End Function   '产生一个(n~m)范围内的随机整数
+//
+Function tap1(x, y, dt)
+    x = x + rnd_(tap参数["min_x"], tap参数["max_x"])
+    y = y + rnd_(tap参数["min_y"], tap参数["max_y"])
+    Dim t= rnd_(tap参数["t0"], tap参数["t1"])
+    TracePrint "{tap1}...点击的坐标=",x,",",y,"	点击后延时=",dt,"毫秒"
+    TouchDown x, y	
+    Delay  t 
+    TouchUp  
+    Delay dt
+End Function  '该函数:  点击坐标(x,y),带随机偏移,偏移范围在表{tap参数}键值里设置
+//
+Function tap2(x, y,x0,y0, dt)
+    x = rnd_(x,x0)
+    y = rnd_(y, y0)
+    Dim t= rnd_(tap参数["t0"], tap参数["t1"])
+    TracePrint "{tap2}...坐标范围x=(", x &","& y &","& x0 &","& y0, ")	点击后延时=",dt,"毫秒"
+    TouchDown x, y
+    Delay t
+    TouchUp  
+    Delay dt
+End Function '该函数:  在指定范围内,随机点击一个坐标. x范围(x,xx),y的范围(y,yy)
+//
+Function OnScriptExit()
+    // TracePrint 	"轮数 = "&轮数
+    // TracePrint 	"战斗次数 = "&战斗次数
+    //TracePrint 	"战斗合计 = "&战斗合计  //&"
+    Dim t = TickCount()/1000    
+    dim h= Int(t/3600)
+    dim m= int((t-h*3600)/60)
+    dim s= int(t-h*3600-m*60 ) 
+    TracePrint "///////////////////////脚本运行时间 =",h&"时",m&"分",s&"秒"
+End Function  //这里面写脚本停止时想自动运行的代码 
+//
+Function sc(颜色值,精度,限时)
+    dim t0=TickCount()
+    Do 
+        If CmpColorEx(颜色值, 精度) = 1 Then 
+            sc = true
+            TracePrint "{sc}找色,成功,   耗时", TickCount()-t0,"毫秒"
+            Exit Function
+        End If
+        Delay 150   
+    Loop While TickCount() - t0 <= 限时
+    sc=false
+    TracePrint "{sc}找色,失败, 超时",限时,"毫秒"
+End Function '在限时内,寻找指定点的颜色值,找到返回true,否则返回false	
+//
+Function scEX(颜色值, 精度, 限时)
+    If IsArray(颜色值) <> true Then 
+        TracePrint 	"{scEX}   错误!!颜色值 必须是数组类型!"
+        Exit Function
+    End If
+    dim t0=TickCount() 
+    Do
+        For i = 0 To UBOUND(颜色值)
+            If CmpColorEx(颜色值(i), 精度) = 1 Then 
+                TracePrint "{scEX}多组找色,成功, i="&i ,"耗时", TickCount()-t0,"毫秒"
+                scEX = i
+                Exit Function 
+            End If
+            Delay 50
+        Next
+        Delay 150 
+    Loop While TickCount() - t0 < 限时
+    scEX = -1
+    TracePrint "{scEX}多组找色,失败, 超时",限时,"毫秒"
+End Function  '限时内,寻找指定点的颜色值组(数组),找到返回i(序号),否则返回-1
+//
+Function scm(颜色值, 精度, 限时)
+    dim t0=TickCount()
+    Do
+        For i = 0 To UBOUND(颜色值)
+            If CmpColorEx(颜色值(i), 精度) = 1 Then 
+                Exit Do 
+            End If
+        Next
+        Delay 150   
+    Loop While TickCount() - t0 <= 限时
+    Do While TickCount() - t0 <= 限时
+        If CmpColorEx(颜色值, 精度) = 0 Then 
+            scm = true
+            TracePrint "{scm}找色,出现后又消失,   耗时", TickCount()-t0,"毫秒"
+            Exit Function
+        End If
+        Delay 75	
+    Loop 
+    scm = False 
+    TracePrint "{scm}找色,失败, 超时",限时,"毫秒"
+End Function '在限定时间内,指定点的颜色值组,出现后又消失.,返回true,否则返回false	
+//
+Function scmEX(颜色值, 精度, 限时)
+    If IsArray(颜色值) <> true Then 
+        TracePrint 	"{scmEX}   错误!!颜色值 必须是数组类型!"
+        Exit Function
+    End If
+    dim t0=TickCount()
+    Dim i
+    Do
+        For i = 0 To UBOUND(颜色值)
+            If CmpColorEx(颜色值(i), 精度) = 1 Then 	
+                Exit Do 
+            End If
+        next
+        Delay 150   
+    Loop While TickCount() - t0 <= 限时
+    Do While TickCount() - t0 <= 限时
+        If CmpColorEx(颜色值(i), 精度) = 0 Then 
+            scmEX = i
+            TracePrint "{scmEX}多组找色,出现后又消失,   耗时", TickCount()-t0,"毫秒"
+            Exit Function
+        End If
+        Delay 75	
+    Loop 
+    scmEX = -1
+    TracePrint "{scmEx}多组找色,失败, 超时",限时,"毫秒"
+End Function '在限定时间内定点的颜色值组(数组),,出现后又消失.返回i(序号),否则返回-1
