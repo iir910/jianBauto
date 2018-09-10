@@ -1,5 +1,5 @@
 //碧蓝航线
-//版本号: 1.0.01
+//版本号: 1.5.01
 Randomize
 SetScreenScale 1280, 720
 If GetScreenX() / GetScreenY() <> 16 / 9 Then 
@@ -8,7 +8,7 @@ If GetScreenX() / GetScreenY() <> 16 / 9 Then
 End If
 //--定义变量--------------------------------------
 Dim intx,inty
-Dim dt '延时
+//Dim dt '延时
 Dim i=0
 //Dim 坐标(10,2) '二维数组
 //Dim arr()
@@ -20,6 +20,10 @@ dim 战斗次数=0
 Dim 索敌结果
 Dim 索敌失败次数
 dim 划图方向=0
+//Dim 敌舰x()
+//Dim 敌舰y()
+Dim 索敌坐标()
+//dim  内容
 ////////////////////////
 dim p_首页 = "812|362|F7DF18,799|379|F7A610,777|425|523408,1011|361|42EBFF,1007|391|10A6E7,980|424|00387B"
 dim p_章节 = "740|676|EFC7A5,764|680|8C6952,942|617|949E7B,972|617|B59694,1144|627|DEEFFF,1173|639|2120FF"
@@ -31,7 +35,7 @@ dim p_战斗胜利 = "209|483|393C39,264|487|21C339,254|494|FFFFFF,250|477|39D352" '
 dim p_结算完毕 = "857|600|DEDFDE,909|608|424142,1059|611|FFFFFF,1152|609|393C39" 
 Dim p_获得舰娘= "58|634|CECBCE,71|619|E7D342,1019|592|393839,55|442|CECBE7,1026|567|EFEFEF" '
 Dim p_新舰娘 = "313|87|3196F7,251|59|7BDFFF,300|41|7BBEFF,124|99|7BC3FF,165|82|10287B,176|119|10287B" 'new
-dim p_出击编队 = "1166|657|D6CF94,1035|612|B5617B,944|614|5A75EF,1123|598|F7F3D6,1143|644|5AAEF7" '出击2
+dim p_出击编队 = "1182|666|D6D38C,1034|607|B5617B,954|600|5A75EF,1202|584|7BCBE7,1074|620|9CDFFF,1061|676|D6D38C,988|604|B5617B,998|645|31148C"
 Dim p_遇到伏击="1008|405|CECFCE,718|403|10AEFF,399|460|18714A,161|391|1069A5,1128|392|1069A5"
 Dim p_获得道具="513|141|63AEF7,776|141|63B6F7,775|182|319AF7,658|187|31DBFF,606|194|31CBFF,559|190|31AAF7"
 Dim p_黑屏="49|112|101410-000080,275|102|101410,678|125|101410,1138|112|101410,45|560|101410,388|560|101410,728|532|101410,1108|496|101410,1214|328|101410,995|221|101410"
@@ -98,7 +102,7 @@ Thread.Start 紧急委托
 //////////////////主线程////////////////////////
 Do
     Dim 界面图组 = Array(p_首页, p_章节,p_战斗中,p_map,p_出击编队,p_战斗结束,p_遇到伏击,p_获得道具, p_黑屏,P_任务,p_每日)  '把要搜的图,写成一个数组
-    dim 序号=  scex(界面图组, 0.9, 2001) '此函数,返回值:序号=整数数值 ;没找到返回:序号=-1
+    dim 序号=  scex(界面图组, 0.92, 2001) '此函数,返回值:序号=整数数值 ;没找到返回:序号=-1
     Select Case 序号 '根据序号值,判断当前处于哪一图, 再作相应的处理.
     Case 0
         TracePrint "在首页"
@@ -427,7 +431,7 @@ Function 从章节进入map
         tap1 940,543,1000
     Case "10-1"
         TracePrint "进入10-1"
-        //  tap1 
+        tap1  222,271,1000
     Case "10-2"
         TracePrint "进入10-2"
         // tap1 
@@ -572,14 +576,14 @@ Function 选队2
 End Function
 Function 在map
     // KeepCapture 
-    Delay 1500
+    Delay 500
     If ReadUIConfig("捡问号") Then 
         捡问号
     End If // 捡问号
     If ReadUIConfig("捡子弹") Then 
         捡子弹
     End If // 捡子弹
-    Delay 1500
+    Delay 500
     // KeepCapture
     索敌失败次数=0  '每次索敌前重置次数
     索敌设置 ("索敌目标0")
@@ -598,6 +602,59 @@ Function 在map
     //  ReleaseCapture
 End Function
 //
+Function 捡问号
+    TracePrint "{捡问号}"
+    Dim ret=fmct(118,50,1275,717,"F7FF94","5|0|F7FF94,11|-1|181821,25|2|EFEFEF",0.95)
+    If ret Then 
+        //TracePrint "////////////////////////////捡问号"
+        dim 偏移x= rnd_(-20,20)
+        dim 偏移y= rnd_(60,75)
+        Dim 问号
+        For i =0 To UBound( 索敌坐标)
+            问号 = Split(索敌坐标(i), ",")
+            If sc(p_map, 0.9, 500) Then 
+                TracePrint "点击问号: " ,问号(0)+偏移x ,",", 问号(1)+偏移y
+                Tap 问号(0) + 偏移x, 问号(1) + 偏移y
+                Delay 500
+            Else 
+                Exit Function
+            End If
+        Next
+    Else 
+        TracePrint "////////////////////////////无问号"
+    End If
+    ////////FindMultiColor 0,0,0,0,"F7FF94","32|0|EFEFEF,3|20|F7F3F7,8|0|292829",0,0.9,intX,intY
+    //    FindMultiColor 0,0,0,0,"F7FF94","5|0|F7FF94,11|-1|181821,25|2|EFEFEF",0,0.94,intX,intY '问号的圆点
+    //    If intX > -1 And intY > -1 Then 
+    //        intX = intx + rnd_(-10, 10)
+    //        inty = inty + rnd_(75, 90)
+    //        TracePrint "////////////////////////////捡问号",intX,inty
+    //        Tap intX, inty
+    //        Delay 1000
+    //    Else 
+    //        TracePrint "////////////////////////////无问号"
+    //    End If
+End Function
+//
+Function 捡子弹
+    //捡子弹前战斗次数
+    dim 捡子弹前战斗次数=ReadUIConfig ("捡子弹前战斗次数",3)
+    If clng(捡子弹前战斗次数) < 战斗次数 Then 
+        //TracePrint  " "
+        Exit Function 
+    End If
+    FindMultiColor 0,0,0,0,"F7F3F7","1|-17|4A8EDE,2|-23|CEF7FF,-11|-25|08458C,26|-10|F7F3F7",0,0.9,intX,intY
+    If intX > -1 And intY > -1 Then 
+        intX = intx + rnd_(-10, 10)
+        inty = inty + rnd_(85, 100)
+        TracePrint "////////////////////////////捡子弹",intX,inty
+        Tap intX, inty
+        Delay 1000
+    Else 
+        TracePrint "////////////////////////////无子弹"
+    End If
+End Function
+//
 Function 索敌设置(读取设置)
     If sc(p_map, 0.9, 300)=false Then 
         Exit Function
@@ -613,52 +670,55 @@ Function 索敌设置(读取设置)
     Case 3
         索敌_大型	
     End Select
-    If intx = -1 Then 
-        ShowMessage 读取设置&",失败",1000,150,700
-        TracePrint 读取设置&",失败"
-        索敌结果 = 0
-        索敌失败次数=索敌失败次数+1   
-    End If
+    //    If intx = -1 Then 
+    //        ShowMessage 读取设置&",失败",1000,150,700
+    //        TracePrint 读取设置&",失败"
+    //        索敌结果 = 0
+    //        索敌失败次数=索敌失败次数+1   
+    //    End If
 End Function
 Function 索敌_小型
     ShowMessage "索敌_小型", 1000, 150, 700
-    //124,173,1240,632
-    FindMultiColor 262,59,1237,635, "10BADE","5|0|10BADE,10|0|10BADE,15|0|10AACE", 0, 0.95, intx, inty
-    If intx > -1 Then 
-        TracePrint "找到小型",intx&","&inty
-        移动 
+    TracePrint "索敌_小型"
+    dim ret= fmct( 262,59,1237,635, "10BADE","5|0|10BADE,10|0|10BADE,15|0|10AACE", 0.95)
+    If  ret Then 
+        移动
     Else 
-        //        索敌结果 = 0
-        //        索敌失败次数=索敌失败次数+1
+        TracePrint "索敌_小型    失败"
+        索敌结果 = 0
+        索敌失败次数 = 索敌失败次数 + 1
     End If
 End Function
 Function 索敌_中型
     ShowMessage "索敌_中型", 1000, 150, 700
-    FindMultiColor 262,59,1237,635, "00A6EF","5|0|00A6EF,10|0|00A6EF,15|0|00A6EF", 0, 0.95, intx, inty
-    If intx > -1 Then 
-        TracePrint "找到中型",intx&","&inty
+    TracePrint "索敌_中型"
+    dim ret= fmct( 262,59,1237,635, "00A6EF","5|0|00A6EF,10|0|00A6EF,15|0|00A6EF", 0.95)
+    If  ret Then 
         移动
     Else 
-        //        索敌结果 = 0
-        //        索敌失败次数=索敌失败次数+1
+        TracePrint "索敌_中型    失败"
+        索敌结果 = 0
+        索敌失败次数 = 索敌失败次数 + 1
     End If
 End Function
 Function 索敌_大型
-    ShowMessage "索敌_大型",1000,150,700
-    FindMultiColor 262,59,1237,635, "0034BD","5|0|0034BD,10|0|0034BD,15|0|0034BD", 0, 0.95, intx, inty
-    If intx > -1 Then 
-        TracePrint "找到大型",intx&","&inty
+    ShowMessage "索敌_大型", 1000, 150, 700
+    TracePrint "索敌_大型"
+    //    FindMultiColor 262,59,1237,635, "0034BD","5|0|0034BD,10|0|0034BD,15|0|0034BD", 0, 0.95, intx, inty
+    dim ret = fmct( 262, 59, 1237, 635, "0034BD","5|0|0034BD,10|0|0034BD,15|0|0034BD", 0.95)
+    If ret Then 
         移动
     Else 
-        //        索敌结果 = 0
-        //        索敌失败次数=索敌失败次数+1
+        TracePrint "索敌_大型    失败"
+        索敌结果 = 0
+        索敌失败次数 = 索敌失败次数 + 1
     End If
 End Function
 Function 索敌_boss
     ShowMessage "索敌_boss",1000, 150, 700
     Delay 500
-     FindMultiColor 262,59,1237,635,  "313431","12|-7|29248C,14|6|313031,7|16|211C52,1|27|524DFF", 0, 0.95, intx, inty 
-   // FindMultiColor 262,59,1237,635, "524DFF","0|-2|524DFF,-3|-1|524DFF,11|-4|292439,14|-7|292439", 0, 0.95, intx, inty
+    //    //  FindMultiColor 262,59,1237,635, "524DFF","0|-2|524DFF,-3|-1|524DFF,11|-4|292439,14|-7|292439", 0, 0.95, intx, inty
+    FindMultiColor 262,59,1237,635,  "313431","12|-7|29248C,14|6|313031,7|16|211C52,1|27|524DFF", 0, 0.95, intx, inty
     If intx = -1 Then 
         ShowMessage "索敌_boss,失败",1000,150,700
         TracePrint "索敌_boss,失败",1000,150,700
@@ -669,12 +729,12 @@ Function 索敌_boss
     TracePrint "////////////////////////////////////////////找到boss!!坐标 : ",intx&","&inty
     If boss队 <> null Then 
         //换队伍
-        Dim 舰队1 = "214|67|ADEBFF,207|68|ADEBFF,215|77|6BD7FF,215|97|00BAFF,210|88|21C3F7,219|78|424142"
-        Dim 舰队2=""
-        Dim 舰队3 ="205|89|18BEF7,214|99|00BAF7,220|90|18BEF7,214|62|ADD7E7,204|67|ADEBFF,223|71|A5EBFF,223|84|31C3F7,217|100|00BAF7,213|90|39384A"
-        Dim 舰队4=""
-        Dim 舰队5=""
-        Dim 舰队6=""
+        Dim 舰队1="219|64|424542,219|75|424142,219|85|424542,219|95|103C4A,214|64|B5EBFF,212|97|00BAF7,207|78|393C39,207|96|314542"
+        Dim 舰队2="203|76|4A656B,213|70|394542,209|65|BDEBFF,216|84|42CBEF,216|92|424142,212|98|08B2F7,224|96|39494A"
+        Dim 舰队3="205|89|18BEF7,214|99|00BAF7,220|90|18BEF7,214|62|ADD7E7,204|67|ADEBFF,223|71|A5EBFF,223|84|31C3F7,217|100|00BAF7,213|90|39384A"
+        Dim 舰队4="212|60|424542,218|60|424542,222|68|314152,217|93|08BAF7,214|67|ADE7FF,202|89|29C3F7,210|84|424142,210|94|393C39,222|89|10BEF7"
+        Dim 舰队5=""    //目前无
+        Dim 舰队6="" //目前无
         Dim 数组=Array(舰队1,舰队2,舰队3,舰队4,舰队5,舰队6)
         Dim 当前队伍=scEX(数组, 0.9, 2000)+1
         If 当前队伍 = boss队 Then 
@@ -689,28 +749,45 @@ Function 索敌_boss
     //切换队伍后,强制搜索boss
     //dim sboss
     FindMultiColor(262,59,1237,635, "524DFF","0|-2|524DFF,-3|-1|524DFF,11|-4|292439,14|-7|292439", 0, 0.95, intx, inty)
-   Do While  intx = -1
-       TracePrint "没搜到boss!! 调整地图" 
+    Do While  intx = -1
+        TracePrint "没搜到boss!! 调整地图" 
         ShowMessage "没搜到boss!! 调整地图" ,1000,150,700
         调整地图 
         Delay 1000 
         FindMultiColor(262,59,1237,635, "524DFF","0|-2|524DFF,-3|-1|524DFF,11|-4|292439,14|-7|292439", 0, 0.95, intx, inty)
-   loop
+    Loop
+    索敌结果=1
     TracePrint "强制,找到boss!!坐标 : ",intx&","&inty
-    //
-    移动 
+    //        移动
+    dim 偏移x= Int((60 - 20 + 1) * Rnd() + 20)
+    dim 偏移y= Int((35 - 20 + 1) * Rnd() + 20)
+    Tap intx + 偏移x, inty + 偏移y
+    Delay 2000 
     ///////
 End Function
 //
 Function 移动
     TracePrint "{移动}"
     索敌结果=1
-    Randomize
-    dim 偏移x= Int((60 - 20 + 1) * Rnd() + 20)
-    dim 偏移y= Int((35 - 20 + 1) * Rnd() + 20)
-    Tap intx + 偏移x, inty + 偏移y
-    Delay 2000
-    //
+    Dim 敌坐标,偏移x,偏移y,dx,dy
+    For i = 0 To UBOUND(索敌坐标)
+        //TracePrint 索敌坐标(i)
+        敌坐标 = Split(索敌坐标(i), ",")
+        //TracePrint 敌坐标(0),敌坐标(1)
+        If sc(p_map, 0.9, 500) Then 
+            偏移x= Rnd_(20,60)
+            偏移y= Rnd_(20,35)
+            dx =CLng (敌坐标(0)) + 偏移x
+            dy =CLng (敌坐标(1)) + 偏移y
+            //TracePrint "/////////点击敌舰: , x=" ,敌坐标(0), "+",偏移x,  "    y=" ,敌坐标(1), "+",偏移y
+             TracePrint "/////////点击敌舰: ",dx,dy
+            Tap dx,dy
+            Delay 500
+        Else 
+            TracePrint "不在map"
+            Exit Function
+        End If
+    Next
 End Function
 //
 Function 遇到伏击
@@ -879,38 +956,6 @@ Function 检查舰娘获取
     tap1 1188,570,1000 '点击继续
 End Function
 //
-Function 捡问号
-    //FindMultiColor 0,0,0,0,"F7FF94","32|0|EFEFEF,3|20|F7F3F7,8|0|292829",0,0.9,intX,intY
-    FindMultiColor 0,0,0,0,"F7FF94","5|0|F7FF94,11|-1|181821,25|2|EFEFEF",0,0.94,intX,intY '问号的圆点
-    If intX > -1 And intY > -1 Then 
-        intX = intx + rnd_(-10, 10)
-        inty = inty + rnd_(75, 90)
-        TracePrint "////////////////////////////捡问号",intX,inty
-        Tap intX, inty
-        Delay 1000
-        Else 
-        TracePrint "////////////////////////////无问号"
-    End If
-End Function
-//
-Function 捡子弹
-    //捡子弹前战斗次数
-    dim 捡子弹前战斗次数=ReadUIConfig ("捡子弹前战斗次数",3)
-    If clng(捡子弹前战斗次数) < 战斗次数 Then 
-        //TracePrint  " "
-        Exit Function 
-    End If
-    FindMultiColor 0,0,0,0,"F7F3F7","1|-17|4A8EDE,2|-23|CEF7FF,-11|-25|08458C,26|-10|F7F3F7",0,0.9,intX,intY
-    If intX > -1 And intY > -1 Then 
-        intX = intx + rnd_(-10, 10)
-        inty = inty + rnd_(85, 100)
-        TracePrint "////////////////////////////捡子弹",intX,inty
-        Tap intX, inty
-        Delay 1000
-          Else 
-        TracePrint "////////////////////////////无子弹"
-    End If
-End Function
 //
 Function 获得道具
     If CmpColorEx("513|141|63AEF7,776|141|63B6F7,775|182|319AF7,658|187|31DBFF,606|194|31CBFF,559|190|31AAF7",0.95) = 1 Then
@@ -1168,13 +1213,13 @@ Function sc(颜色值,精度,限时)
     Do 
         If CmpColorEx(颜色值, 精度) = 1 Then 
             sc = true
-            TracePrint "{sc}找色,成功,   耗时", TickCount()-t0,"毫秒"
+            TracePrint "//////////////////////{sc}找色,成功,   耗时", TickCount()-t0,"毫秒"
             Exit Function
         End If
         Delay 150   
     Loop While TickCount() - t0 <= 限时
     sc=false
-    TracePrint "{sc}找色,失败, 超时",限时,"毫秒"
+    TracePrint "//////////////////////{sc}找色,失败, 超时",限时,"毫秒"
 End Function '在限时内,寻找指定点的颜色值,找到返回true,否则返回false	
 //
 Function scEX(颜色值, 精度, 限时)
@@ -1186,7 +1231,7 @@ Function scEX(颜色值, 精度, 限时)
     Do
         For i = 0 To UBOUND(颜色值)
             If CmpColorEx(颜色值(i), 精度) = 1 Then 
-                TracePrint "{scEX}多组找色,成功, i="&i ,"耗时", TickCount()-t0,"毫秒"
+                TracePrint "//////////////////////{scEX}多组找色,成功, i="&i ,"耗时", TickCount()-t0,"毫秒"
                 scEX = i
                 Exit Function 
             End If
@@ -1195,9 +1240,9 @@ Function scEX(颜色值, 精度, 限时)
         Delay 150 
     Loop While TickCount() - t0 < 限时
     scEX = -1
-    TracePrint "{scEX}多组找色,失败, 超时",限时,"毫秒"
+    TracePrint "//////////////////////{scEX}多组找色,失败, 超时",限时,"毫秒"
 End Function  '限时内,寻找指定点的颜色值组(数组),找到返回i(序号),否则返回-1
-//下面两个函数,暂时没有用上....
+//这个函数,暂时没有用上....
 Function scm(颜色值, 精度, 限时)
     dim t0=TickCount()
     Do
@@ -1219,7 +1264,7 @@ Function scm(颜色值, 精度, 限时)
     scm = False 
     TracePrint "{scm}找色,失败, 超时",限时,"毫秒"
 End Function '在限定时间内,指定点的颜色值组,出现后又消失.,返回true,否则返回false	
-//
+//这个函数,暂时没有用上....
 Function scmEX(颜色值, 精度, 限时)
     If IsArray(颜色值) <> true Then 
         TracePrint 	"{scmEX}   错误!!颜色值 必须是数组类型!"
@@ -1245,3 +1290,51 @@ Function scmEX(颜色值, 精度, 限时)
     scmEX = -1
     TracePrint "{scmEx}多组找色,失败, 超时",限时,"毫秒"
 End Function '在限定时间内定点的颜色值组(数组),,出现后又消失.返回i(序号),否则返回-1
+//////////////////
+Function fmct(a, b, c, d, 第一点, 其余点, 精度)
+    KeepCapture 
+    Dim 字符串
+    Dim intx, inty
+    FindMultiColor a, b, c, d, 第一点, 其余点, 0, 精度, intx, inty
+    If intx = -1  Then 
+        fmct = false
+        ReleaseCapture
+        Exit Function
+    End If '先找一次, 若找不到,就直接返回false,结束函数
+    //
+    dim 坐标组()
+    Dim i=0
+    do While intx > -1 
+        坐标组(i) = CStr(intx) & "," & CStr(inty)
+        // TracePrint i,坐标组(i)
+        i = i + 1
+        FindMultiColor intx+50, b, c, d, 第一点, 其余点, 0, 精度, intx,inty
+    Loop
+    FindMultiColor a, b, c, d, 第一点, 其余点, 0, 精度, intx, inty
+    Do While  intx > -1 
+        坐标组(i) = CStr(intx) & "," & CStr(inty)
+        // TracePrint i,坐标组(i)
+        i=i+1
+        FindMultiColor a, inty+50, c, d, 第一点, 其余点, 0, 精度, intx, inty
+    Loop
+    ReleaseCapture 
+    //
+    For i = 0 To UBound(坐标组)
+        For j = 0 To UBound(坐标组)
+            If 坐标组(i) = 坐标组(j) and i <> j   Then 
+                坐标组(j) = ""
+                字符串 = Join(坐标组, "|")
+                字符串 = Replace(字符串,"||","|")
+                坐标组 = Split(字符串, "|")
+                j = j - 1
+            End If
+        Next
+    Next  '数据去重复
+    For i = 0 To UBound(坐标组)
+        If 坐标组(i) <> "" and 坐标组(i) <>null Then 
+            // TracePrint "//////////调试输出:::: ",i,坐标组(i)
+            索敌坐标(i) = 坐标组(i)
+        End If
+    Next  '数据 删除空值/无效值
+    fmct = true
+End Function '搜索范围内 所有符合颜色的点, 以数组输出(输出的形式如"123,100"字符串, 后续使用需要切割为数组)
