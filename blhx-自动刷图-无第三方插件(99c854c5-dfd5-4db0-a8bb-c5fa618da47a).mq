@@ -1,5 +1,5 @@
 //±Ã¿∂∫Ωœﬂ
-//∞Ê±æ∫≈: 1.5.01
+//∞Ê±æ∫≈: 1.5
 Randomize
 SetScreenScale 1280, 720
 If GetScreenX() / GetScreenY() <> 16 / 9 Then 
