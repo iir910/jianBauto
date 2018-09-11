@@ -1,0 +1,166 @@
+//
+//a1 459, 208
+//a2 762,545
+//
+
+//
+Randomize
+//
+Dim tap参数={"min_x":-30,"max_x":3, "min_y":-30,"max_y":2, "t0":10,"t1":50} '设置点击的坐标偏移和按下时间
+dim p_首页 = "812|362|F7DF18,799|379|F7A610,777|425|523408,1011|361|42EBFF,1007|391|10A6E7,980|424|00387B"
+dim p_章节 = "740|676|EFC7A5,764|680|8C6952,942|617|949E7B,972|617|B59694,1144|627|DEEFFF,1173|639|2120FF"
+Dim p_map=    "610|678|000000,774|669|0804C6,1117|649|0875DE,1224|681|103C6B,1125|667|F7FBFF,622|681|BDBABD,1006|683|292829"
+dim p_战斗中 = "1251|64|E7E3E7,1228|66|DEDFE7,1240|52|313431,1222|48|313431,1228|26|DEDFE7,1209|45|DEDFE7"
+dim p_战斗结束 = "30|344|0869AD,104|338|0865A5,169|343|0865A5,1134|349|0865A5,1206|352|0865A5" '黄斜线的颜色
+dim p_战斗胜利 = "209|483|393C39,264|487|21C339,254|494|FFFFFF,250|477|39D352" '第一个绿勾和周围颜色
+dim p_结算完毕 = "857|600|DEDFDE,909|608|424142,1059|611|FFFFFF,1152|609|393C39" 
+Dim p_获得舰娘= "58|634|CECBCE,71|619|E7D342,1019|592|393839,55|442|CECBE7,1026|567|EFEFEF" '
+Dim p_新舰娘 = "313|87|3196F7,251|59|7BDFFF,300|41|7BBEFF,124|99|7BC3FF,165|82|10287B,176|119|10287B" 'new
+dim p_出击编队 = "1182|666|D6D38C,1034|607|B5617B,954|600|5A75EF,1202|584|7BCBE7,1074|620|9CDFFF,1061|676|D6D38C,988|604|B5617B,998|645|31148C"
+Dim P_空袭="450|338|F3F0EF,1067|338|4644FF,1067|383|0000FF,442|425|352930,559|424|98909C,556|354|E5DFDF,700|333|4B4CFF"
+Dim p_遇到伏击="1008|405|CECFCE,718|403|10AEFF,399|460|18714A,161|391|1069A5,1128|392|1069A5"
+Dim p_获得道具="513|141|63AEF7,776|141|63B6F7,775|182|319AF7,658|187|31DBFF,606|194|31CBFF,559|190|31AAF7"
+Dim p_黑屏="49|112|101410-000080,275|102|101410,678|125|101410,1138|112|101410,45|560|101410,388|560|101410,728|532|101410,1108|496|101410,1214|328|101410,995|221|101410"
+Dim p_信息窗口="926|188|42D7FF,959|189|ADAAAD,658|173|F7F3EF,672|206|DEDFDE,496|201|000000,308|166|F7F3EF,344|198|10BEFF"
+dim P_任务="45|23|42DBFF,286|34|000000,184|13|D6F7FF,136|32|10BAFF,530|33|DEDFDE,100|67|635D5A,15|60|5A5952"
+Dim p_每日="233|653|C6E3FF,310|514|9CAEE7,168|235|C6DFFF,183|102|94BEF7,301|347|425DD6,70|30|DEDBDE,487|36|DEDFDE,163|397|73BEEF" 
+Dim p_活动图="50|114|FFFFFF,59|134|000000,444|157|7A69FF,1076|653|FEE911,1214|81|FFF9FF,684|96|9745ED"
+//
+dim 战斗次数=0
+//
+Do
+    Dim 界面图组 = Array(p_首页, p_活动图,p_出击编队,p_战斗中,p_战斗结束)  '把要搜的图,写成一个数组
+    dim 序号=  scex(界面图组, 0.90, 2001) '此函数,返回值:  序号 ;没找到返回:序号=-1
+    Select Case 序号 '根据序号值,判断当前处于哪一图, 再作相应的处理.
+    Case 0
+        首页
+    Case 1
+          TracePrint "活动图"
+        活动图 (3)
+        
+    Case 2
+    TracePrint "出击编队"
+    出击编队
+    Case 3
+        TracePrint "战斗中"
+        Delay 2000
+        ShowMessage "战斗次数:"&战斗次数
+    Case 4
+        TracePrint "战斗结束"  
+        战斗结束
+    Case 5
+    Case -1
+        TracePrint "//////////////////////////////////////////什么都没有找到!  无法确认当前处于哪个界面"
+    End Select  
+    Delay 1000
+Loop
+Function 首页
+    //主页
+    tap1 703,341,1500
+End Function
+Function 活动图(lv)
+    If lv = 1 Then 
+        //
+    ElseIf lv = 2 Then
+        //
+    ElseIf lv=3 then
+        tap1 1007, 334, 1500
+    End If
+    //选队
+    //
+出击编队
+End Function
+Function 战斗结束
+    TracePrint  "战斗结束,判断win?lose?"
+    //            本轮战斗次数 = 本轮战斗次数 + 1
+    //            总共战斗次数= 总共战斗次数+1
+    Delay 1000 
+    tap1 340,400,1000 '关闭 战斗评级 s ~ c
+    tap1 635,647,1000  '关闭 获得道具
+    //
+    Delay 3000
+    //            Dim 组=Array(p_结算完毕,p_获得舰娘)
+    //            If scEX(组, 0.9, 3005) = 1 Then 
+    //                检查舰娘获取 
+    //                Delay 1000
+    //            End If
+    tap1 1193, 634, 1000  '关闭 确认按钮	
+End Function
+//
+Function 出击编队
+     dim 自律战斗 = CmpColorEx("173|89|4AF7AD,183|86|4AF7AD,183|93|4AF7AD", 0.95) 'on/off的颜色
+    If 自律战斗 = 1 Then 
+        TracePrint "自律  ON"
+    Else 
+        tap2  121,82,188,99,200
+        TracePrint "自律OFF, 修改为ON"
+        If CmpColorEx("726|543|18B6FF,727|496|003894,925|163|42D7FF,958|164|ADAAAD",0.9) = 1 Then
+            TracePrint "关闭自律消息"
+            tap1 726,543,500
+        End If
+    End If
+     tap1 1190,674,1000  
+    战斗次数 = 战斗次数 + 1
+    
+End Function////////////////////////////////
+Function rnd_(n, m)	
+    rnd_=int((m-n+1)*rnd()+n)
+End Function   '产生一个(n~m)范围内的随机整数
+//
+Function tap1(x, y, dt)
+    x = x + rnd_(tap参数["min_x"], tap参数["max_x"])
+    y = y + rnd_(tap参数["min_y"], tap参数["max_y"])
+    Dim t= rnd_(tap参数["t0"], tap参数["t1"])
+    TracePrint "{tap1}...点击坐标："&x&","&y,"延时=",dt,"毫秒"
+    TouchDown x, y	
+    Delay  t 
+    TouchUp  
+    Delay dt
+End Function  '该函数:  点击坐标(x,y),带随机偏移,偏移范围在表{tap参数}键值里设置
+//
+Function tap2(a,b,c,d,dt)
+    //Dim 触摸时间= rnd_(tap参数["t0"], tap参数["t1"])
+    Dim 触摸时间= rnd_(30,50)
+    TracePrint "{tap2}...坐标范围(", a &","& b &","& c &","& d, ")	 延时=",dt,"毫秒"
+    dim  x坐标 = rnd_(a,c)
+    dim  y坐标 = rnd_(b,d)
+    TouchDown x坐标, y坐标
+    Delay 触摸时间
+    TouchUp  
+    Delay dt
+End Function '该函数:  在指定范围内,随机点击一个坐标. x范围(x,xx),y的范围(y,yy)
+//
+Function sc(颜色值,精度,限时)
+    dim t0=TickCount()
+    Do 
+        If CmpColorEx(颜色值, 精度) = 1 Then 
+            sc = true
+            TracePrint "//////////////////////{sc}找色,成功,   耗时", TickCount()-t0,"毫秒"
+            Exit Function
+        End If
+        Delay 100   
+    Loop While TickCount() - t0 <= 限时
+    sc=false
+    TracePrint "//////////////////////{sc}找色,失败, 超时",限时,"毫秒"
+End Function '在限时内,寻找指定点的颜色值,找到返回true,否则返回false	
+//
+Function scEX(颜色值, 精度, 限时)
+    If IsArray(颜色值) <> true Then 
+        TracePrint 	"{scEX}   错误!!颜色值 必须是数组类型!"
+        Exit Function
+    End If  
+    dim t0=TickCount() 
+    Do
+        For i = 0 To UBOUND(颜色值)
+            If CmpColorEx(颜色值(i), 精度) = 1 Then 
+                TracePrint "//////////////////////{scEX}多组找色,成功, i="&i ,"耗时", TickCount()-t0,"毫秒"
+                scEX = i
+                Exit Function 
+            End If
+            Delay 20
+        Next
+        Delay 100 
+    Loop While TickCount() - t0 < 限时
+    scEX = -1
+    TracePrint "//////////////////////{scEX}多组找色,失败, 超时",限时,"毫秒"
+End Function  '限时内,寻找指定点的颜色值组(数组),找到返回i(序号),否则返回-1
