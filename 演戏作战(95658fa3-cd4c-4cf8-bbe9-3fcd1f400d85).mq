@@ -86,19 +86,7 @@ Function 战斗结束
     //            End If
     tap1 1193, 634, 1000  '关闭 确认按钮	
 End Function
-//
 Function 出击编队
-     dim 自律战斗 = CmpColorEx("173|89|4AF7AD,183|86|4AF7AD,183|93|4AF7AD", 0.95) 'on/off的颜色
-    If 自律战斗 = 1 Then 
-        TracePrint "自律  ON"
-    Else 
-        tap2  121,82,188,99,200
-        TracePrint "自律OFF, 修改为ON"
-        If CmpColorEx("726|543|18B6FF,727|496|003894,925|163|42D7FF,958|164|ADAAAD",0.9) = 1 Then
-            TracePrint "关闭自律消息"
-            tap1 726,543,500
-        End If
-    End If
      tap1 1190,674,1000  
     战斗次数 = 战斗次数 + 1
     

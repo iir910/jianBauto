@@ -1,6 +1,13 @@
 '模拟器参数: mumu 1280*720 240dpi 极速+ 渲染加速
+SetScreenScale 1280, 720,1
+If GetScreenX() / GetScreenY() <> 16 / 9 Then 
+    TracePrint "分辨率 宽高比 不是16:9!!  不符合,停止脚本"
+    EndScript
+End If
 '===================
 Randomize //初始化,只需执行一次
+
+
 Dim tap参数={"min_x":-30,"max_x":3, "min_y":-30,"max_y":2, "t0":10,"t1":50} '设置点击的坐标偏移和按下时间
 '=============定义变量================
 '设置固定坐标x浮动范围[-10,15], 固定坐标y浮动范围[-5,20], 点击后默认延时2000毫秒
@@ -34,7 +41,7 @@ Dim p_结算="1043|622|BDBEC6,1150|606|525152,1184|616|B5BABD,1202|588|B5B6B5,1110
 '========判断目前所在状态============================================
 Do
     Dim arr=array(p_首页,p_章节,p_战斗中,p_演习,p_win,p_lose)
-    dim 序号=scex(arr,0.9,1500)
+    dim 序号=scex(arr,0.92,1000)
     Select Case 序号
     Case 0
         TracePrint "主页"
@@ -130,16 +137,6 @@ Function tap2(x, y,x0,y0, dt)
     Delay dt
 End Function '该函数:  在指定范围内,随机点击一个坐标. x范围(x,xx),y的范围(y,yy)
 //
-Function OnScriptExit()
-    // TracePrint 	"轮数 = "&轮数
-    // TracePrint 	"战斗次数 = "&战斗次数
-    //TracePrint 	"战斗合计 = "&战斗合计  //&"
-    Dim t = TickCount()/1000    
-    dim h= Int(t/3600)
-    dim m= int((t-h*3600)/60)
-    dim s= int(t-h*3600-m*60 ) 
-    TracePrint "///////////////////////脚本运行时间 =",h&"时",m&"分",s&"秒"
-End Function  //这里面写脚本停止时想自动运行的代码 
 //
 Function sc(颜色值,精度,限时)
     dim t0=TickCount()
@@ -170,7 +167,7 @@ Function scEX(颜色值, 精度, 限时)
             End If
             Delay 50
         Next
-        Delay 150 
+        Delay 100 
     Loop While TickCount() - t0 < 限时
     scEX = -1
     TracePrint "{scEX}多组找色,失败, 超时",限时,"毫秒"
