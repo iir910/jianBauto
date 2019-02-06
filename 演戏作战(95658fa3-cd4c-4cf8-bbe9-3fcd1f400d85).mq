@@ -2,7 +2,12 @@
 //a1 459, 208
 //a2 762,545
 //
-
+'模拟器参数: mumu 1280*720 240dpi 极速+ 渲染加速
+SetScreenScale 1280, 720,1
+If GetScreenX() / GetScreenY() <> 16 / 9 Then 
+    TracePrint "分辨率 宽高比 不是16:9!!  不符合,停止脚本"
+    EndScript
+End If
 //
 Randomize
 //
@@ -56,13 +61,14 @@ Do
 Loop
 Function 首页
     //主页
-    tap1 703,341,1500
+//    tap1 703,341,1500
+tap1 693,188,1500
 End Function
 Function 活动图(lv)
     If lv = 1 Then 
-        //
+        tap1 117,295,1500
     ElseIf lv = 2 Then
-        //
+        tap1 540,294,1520
     ElseIf lv=3 then
         tap1 1007, 334, 1500
     End If
@@ -87,6 +93,18 @@ Function 战斗结束
     tap1 1193, 634, 1000  '关闭 确认按钮	
 End Function
 Function 出击编队
+         Delay 200
+    dim 自律战斗 = CmpColorEx("173|89|4AF7AD,183|86|4AF7AD,183|93|4AF7AD", 0.95) 'on/off的颜色
+    If 自律战斗 = 1 Then 
+        TracePrint "自律  ON"
+    Else 
+        tap2  121,82,188,99,200
+        TracePrint "自律OFF, 修改为ON"
+        If CmpColorEx("726|543|18B6FF,727|496|003894,925|163|42D7FF,958|164|ADAAAD",0.9) = 1 Then
+            TracePrint "关闭自律消息"
+            tap1 726,543,1000
+        End If
+    End If
      tap1 1190,674,1000  
     战斗次数 = 战斗次数 + 1
     
