@@ -42,7 +42,6 @@ Function mode6()
     UIP.SetAttribute "每日挑战", {"选中":false}
     
 End Function
-
 //舰娘脸色变化时
 Function 心情处理1
     UIP.SetAttribute "心情中止", {"选中":false}
