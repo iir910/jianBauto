@@ -10,17 +10,17 @@ If GetScreenX() / GetScreenY() <> 16 / 9 Then
     EndScript
 End If '检查分辨率
 ///////////////////
-dim 脚本限时= 600*60*1000 '分钟
+dim 脚本限时= (60*1000)*600 '分钟
 Dim 出击的队伍1= 1
 Dim 出击的队伍2= 2
 dim 每次都重置章节= false 
-Dim 章节设定值= "8-2"
-dim 模式设定 =0
+Dim 章节设定值= "7-2"
+dim 模式设定 =1
 Dim 是否退役=True
 Dim 强搜=true
 Dim n战后=5
 //dim boss队 = null
-dim boss队 = 2
+dim boss队 = 1
 dim boss优先 = 1 
 ////////
 Dim 获得新船时截图=true,完成重置章节
@@ -218,7 +218,7 @@ Function 在章节
         //以下内容随活动地图的不同做修改
         //        tap1 940,335, 1000  '点击 sp1
         //        tap1 600,558, 1000  '点击 sp2
-        tap1 416,274, 1000  '点击 sp3
+        tap1 908,530, 1000  '点击 sp3
         tap1 1009,503,1000  '点击 立刻前往1
         //tap1  944,335,1000
         舰队选择 
@@ -423,9 +423,12 @@ Function 舰队选择
         EndScript
     Case -1
     End Select
-    If sc(p_map, 0.9, 500,"在map不?") Then 
+    //
+    If sc(p_map, 0.9, 500,"已经在map不?") Then 
+        TracePrint "已经在map,跳过选择舰队!"
         Exit Function
     End If '可能原本就已经在出击中
+    //
     Dim 位置1空缺="395|173|39517B"
     Dim 位置2空缺="395|307|39517B"
     If CmpColorEx(位置1空缺, 0.9) = 0 Then 
@@ -465,7 +468,7 @@ Function 舰队选择
         End If
     End If
     tap1  1139,644,1000 '立刻前往2
-    If sc(p_map, 0.5, 500, "") Then 
+    If sc(p_map, 0.9, 1500, "") Then 
         轮数 = 轮数 + 1
         本轮战斗次数 = 0
         本轮打伏次数=0
@@ -563,7 +566,7 @@ End Function
 Function 捡问号
     // 读取设置
     TracePrint "{捡问号}"
-    Dim 搜问号=索敌all ("F5FF91","26|-17|EBEBEB,36|-11|EBEBEB,2|-21|F6FF97",0.92,"搜问号")
+    Dim 搜问号=索敌all ("F5FF91","26|-17|EBEBEB,36|-11|EBEBEB,2|-21|F6FF97",0.94,"搜问号")
     If 搜问号 Then 
         TracePrint "////////////////////////////搜索到了，捡问号"
         移动(-15,25,73,85)
@@ -742,8 +745,7 @@ End Function
 Function boss
     ShowMessage "索敌_boss", 1000, 150, 700
     TracePrint "{索敌_boss}  "
-    //boss = 索敌all("313431", "12|-7|29248C,14|6|313031,7|16|211C52,1|27|524DFF", 0.91, "搜boss")
-    boss = 索敌all("514CFB","2|1|514DFB,-1|1|514CFB,9|-3|2B253A,5|-5|2B233D,3|1|514EFB,-2|-1|504DFB,10|-5|2B233B", 0.91, "搜boss")
+    boss = 索敌all("A5A2FF","9|5|313031,14|22|524DFF,42|23|524DFF", 0.91, "搜boss")
 End Function
 //
 Function 索敌_boss  
@@ -870,8 +872,8 @@ Function 处理伏击
     TracePrint "p_遇到伏击 "
     If ReadUIConfig("伏击", true) Then 
         TracePrint "点击 规避伏击"
-        //        tap1 1008, 404, 500
-        tap1 721,405,1000 '迎击	
+        tap1 1008, 404, 500
+        //        tap1 721,405,1000 '迎击	
         Dim 数组={p_出击编队,p_map }
         Select Case scex(数组, 0.9, 1500,"")
         Case 0
@@ -951,32 +953,30 @@ Function 退役舰娘
     Dim k=0
     KeepCapture
     For i = 0 To 6
-        If CmpColor(183+170*i, 256,  退役颜色(),0.96) > -1 Then '检查 1-7 卡片色
-            x = (183 + 170 * i) + rnd_(-80, -10)
-            y = 256 + rnd_(-20, 20)
-            dt = rnd_(400, 1000)
+        dt = rnd_(500, 1000)
+        If CmpColor(183+170*i, 256,  退役颜色(),0.97) > -1 Then '检查 1-7 卡片色
+            x = (183 + 170 * i) + rnd_(-70, -10)
+            y = 256 + rnd_(-20, 10)
             Tap x, y 
             Delay  dt
             k=k+1
         Else 
             TracePrint   "位置"&i+1&"不符合"
             ShowMessage "位置" & i + 1 & "不符合"
-            dt = rnd_(500,1000)
             Delay  dt
         End If 
     Next    
     For i = 0 To 2  
-        If CmpColor(183+170*i, 487,退役颜色(),0.96) > -1 Then '检查 8-10 卡片色
-            x=(183 + 170 * i)+rnd_(-80, -10)
-            y=487+  rnd_(-20, 20)
-            dt = rnd_(800, 1000)
+        dt = rnd_(500, 1000)
+        If CmpColor(183+170*i, 487,退役颜色(),0.97) > -1 Then '检查 8-10 卡片色
+            x=(183 + 170 * i)+rnd_(-70, -10)
+            y=487+  rnd_(-20, 10)
             Tap x, y
             Delay  dt
             k = k + 1
         Else 
             //            TracePrint   "位置"&i+8&"不符合"
             ShowMessage "位置" & i + 8 & "不符合"
-            dt = rnd_(500, 1000)
             Delay  dt
         End If 
     Next
@@ -988,12 +988,12 @@ Function 退役舰娘
         EndScript
     End If
     //
-    tap1 1187,696, rnd_(500, 1800)  '选完，确定
+    tap2 1046,661,1181,695, rnd_(500, 1800)  '选完，确定
     tap2 948,608,1087,646,rnd_(500, 1800) '再次确定
     tap2 433,644,692,678,rnd_(500, 1000)    '获得道具
     tap2 947,588,1035,628,rnd_(500, 1000) '装备 .确定
     tap2 705,473,847,513,rnd_(500, 1000)   '拆解
-    tap2 433,644,692,678,rnd_(500, 1000) '获得道具
+    tap2 433,644,692,678,rnd_(500, 1500) '获得道具
     /*  检查第一点颜色,继续循环?
     If CmpColor(183 + 170, 256, 退役颜色, 0.95) > -1 Then 
         Goto 退役
@@ -1056,7 +1056,7 @@ End Function
 Function 检查血条(a,b,c,d)
     //    TracePrint "{检查血条}"
     Dim intX,intY
-    Dim 设定值=2/3  '设定剩余几分之几的血量
+    Dim 设定值=7/10  '设定剩余几分之几的血量
     FindColor a, b, c, d, "3CEB9E|4069ED", 0, 0.95, intX, intY
     dim   血条进度=CmpColor(a+ int((c-a)*设定值),b+3, "3CEB9E|4069ED", 0.9)
     If intX > -1   And 血条进度 = -1   Then 
@@ -1073,6 +1073,7 @@ Function 战斗中
     ShowMessage "以下计数不含此次在内"&"\n轮数 = " & 轮数 & "\n本轮战斗次数 = " & 本轮战斗次数 & "\n总共战斗次数= " & 总共战斗次数& "\n本轮打伏次数= " & 本轮打伏次数& "\n总打伏次数= " & 总打伏次数
     Delay 300
 End Function
+//
 Function 战斗结束
     TracePrint  "战斗结束,判断win?lose?"
     本轮战斗次数 = 本轮战斗次数 + 1
